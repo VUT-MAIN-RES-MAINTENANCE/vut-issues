@@ -307,7 +307,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('home1.png') no-repeat center center;
+    background: url('../images/home1.png') no-repeat center center;
     background-size: cover;
     filter: blur(2.5px);
     z-index: -1;
@@ -500,7 +500,7 @@ body {
 
 /* About Us Section Customization */
 .about-hero-banner {
-    background: linear-gradient(rgba(0, 38, 81, 0.9), rgba(0, 38, 81, 0.9)), url('Fix.png');
+    background: linear-gradient(rgba(0, 38, 81, 0.9), rgba(0, 38, 81, 0.9)), url('../images/Fix.png');
     background-size: cover;
     background-position: center;
     padding: 6rem 2rem;
@@ -996,7 +996,7 @@ textarea.form-control {
 }
 
 .btn-remove-report {
-    background-color: #ef4444;D
+    background-color: #ef4444;
     color: #fff;
     margin-right: 10px;
 }
@@ -1177,7 +1177,7 @@ textarea.form-control {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('home1.png') no-repeat center center;
+    background: url('../images/home1.png') no-repeat center center;
     background-size: cover;
     filter: blur(8px); /* Professional blur to make container pop */
     opacity: 0.5; /* Balanced visibility */
@@ -1187,12 +1187,13 @@ textarea.form-control {
 .auth-wrapper { 
       width: 100%; 
       max-width: 750px; 
-      padding: 160px 15px 80px; /* Increased bottom padding */
-      min-height: 100vh; /* Occupies full viewport height */
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      margin: 0 auto; 
+      padding: 120px 15px 60px; /* Adjusted padding for better visibility */
+      margin: 0 auto;
+      height: auto;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex: none; /* Don't allow it to shrink */
   } 
   
@@ -1202,10 +1203,11 @@ textarea.form-control {
        backdrop-filter: blur(10px); /* Glass blur effect */
        -webkit-backdrop-filter: blur(10px); /* Safari support */
        width: 100%; 
-        height: 380px; 
+        height: auto;
+        min-height: 500px;
         border-radius: 12px; /* Increased for curved corners */ 
         box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12); 
-        overflow: hidden;
+        overflow: visible;
        border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle glass border */
    }
 

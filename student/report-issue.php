@@ -1,3 +1,124 @@
+<?php
+require_once '../includes/config.php';
+require_once '../includes/auth.php';
+require_once '../includes/json.php';
+
+// Require login
+require_login('login.php');
+
+$error = '';
+$success = '';
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = get_current_user_id();
+    $user = get_user_by_id($user_id, ROLE_STUDENT);
+    
+    if (!$user) {
+        $error = 'User not found.';
+    } else {
+        // Process each report column (up to 3 reports)
+        $reports_submitted = 0;
+        
+        for ($i = 1; $i <= 3; $i++) {
+            $prefix = ($i === 1) ? '' : '_' . $i;
+            
+            $student_no = trim($_POST['student_no' . $prefix] ?? '');
+            $residence = $_POST['residence' . $prefix] ?? '';
+            $block = $_POST['block' . $prefix] ?? '';
+            $room = $_POST['room' . $prefix] ?? '';
+            $issue = $_POST['issue' . $prefix] ?? '';
+            $gender = $_POST['gender' . $prefix] ?? '';
+            $description = trim($_POST['description' . $prefix] ?? '');
+            
+            // Skip if first column is empty (no report submitted)
+            if ($i === 1 && empty($student_no) && empty($residence)) {
+                continue;
+            }
+            
+            // Skip if other columns are empty
+            if ($i > 1 && empty($student_no) && empty($residence)) {
+                continue;
+            }
+            
+            // Validate required fields for this report
+            if (empty($student_no) || empty($residence) || empty($block) || empty($room) || empty($issue) || empty($gender)) {
+                $error = "Please fill all required fields for Report $i.";
+                break;
+            }
+            
+            // Handle image upload
+            $image_path = '';
+            if (isset($_FILES['picture' . $prefix]) && $_FILES['picture' . $prefix]['error'] === UPLOAD_ERR_OK) {
+                $file = $_FILES['picture' . $prefix];
+                
+                // Validate file type
+                if (!in_array($file['type'], ALLOWED_IMAGE_TYPES)) {
+                    $error = "Invalid image type for Report $i. Only JPG and PNG allowed.";
+                    break;
+                }
+                
+                // Validate file size
+                if ($file['size'] > MAX_IMAGE_SIZE) {
+                    $error = "Image too large for Report $i. Maximum 5MB allowed.";
+                    break;
+                }
+                
+                // Create upload directory if it doesn't exist
+                if (!file_exists(ISSUES_PICTURE_PATH)) {
+                    mkdir(ISSUES_PICTURE_PATH, 0777, true);
+                }
+                
+                // Generate unique filename
+                $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $filename = 'issue_' . generate_id() . '.' . $extension;
+                $upload_path = ISSUES_PICTURE_PATH . '/' . $filename;
+                
+                // Move uploaded file
+                if (move_uploaded_file($file['tmp_name'], $upload_path)) {
+                    $image_path = 'pictures/issues/' . $filename;
+                } else {
+                    $error = "Failed to upload image for Report $i.";
+                    break;
+                }
+            }
+            
+            // Create maintenance request
+            $request = [
+                'id' => generate_id('issue_'),
+                'student_id' => $user_id,
+                'student_name' => $user['name'],
+                'student_no' => htmlspecialchars($student_no),
+                'residence' => htmlspecialchars($residence),
+                'block' => htmlspecialchars($block),
+                'room' => htmlspecialchars($room),
+                'issue' => htmlspecialchars($issue),
+                'gender' => htmlspecialchars($gender),
+                'description' => htmlspecialchars($description),
+                'image' => $image_path,
+                'status' => STATUS_PENDING,
+                'assigned_to' => null,
+                'maintenance_notes' => '',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+            
+            if (json_add(MAINTENANCE_REQUESTS_FILE, $request)) {
+                $reports_submitted++;
+                // Log activity
+                log_activity($user_id, ROLE_STUDENT, 'report_issue', "Reported issue: $issue", $request['id']);
+            } else {
+                $error = "Failed to save Report $i.";
+                break;
+            }
+        }
+        
+        if ($reports_submitted > 0 && empty($error)) {
+            $success = "$reports_submitted issue(s) reported successfully!";
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,18 +127,18 @@
     <meta name="description" content="Report maintenance issues at VUT Main Residence easily using our online website.">
     <meta name="keywords" content="VUT, Report Issue, Maintenance website, Student Support">
     <title>Report - MainRes Maintenance</title>
-    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/png" href="../assets/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="home-page">
     <nav class="navbar">
         <input type="checkbox" id="nav-toggle" class="nav-toggle-input">
         <div class="logo">
-            <img src="logo.png" alt="VUT Logo" class="nav-logo">
+            <img src="../assets/images/logo.png" alt="VUT Logo" class="nav-logo">
             VUT MainRes<span>Maintenance</span>
         </div>
         <label for="nav-toggle" class="menu-toggle-btn">
@@ -26,17 +147,30 @@
             <div class="bar"></div>
         </label>
         <ul class="nav-links" id="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="report.html">Report</a></li>
-            <li><a href="auth.html#login" class="nav-btn-text">Log In</a></li>
-            <li><a href="auth.html#signup" class="nav-btn-primary">Sign Up</a></li>
+            <li><a href="../index.php">Home</a></li>
+            <li><a href="../index.php?page=about">About</a></li>
+            <li><a href="report-issue.php">Report</a></li>
+            <li><a href="my-issues.php" class="nav-btn-text">My Issues</a></li>
+            <li><a href="profile.php" class="nav-btn-text">Profile</a></li>
+            <li><a href="login.php?action=logout" class="nav-btn-primary">Log Out</a></li>
         </ul>
     </nav>
 
     <section class="report-section page-container">
         <h2 class="section-title">Report an Issue</h2>
         <p class="section-subtitle">Found something that needs fixing? Let us know and we'll handle it.</p>
+        
+        <?php if ($error): ?>
+            <div class="error-message" style="color: #ef4444; margin-bottom: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px; text-align: center;">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($success): ?>
+            <div class="success-message" style="color: #22c55e; margin-bottom: 1rem; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-radius: 8px; text-align: center;">
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+        <?php endif; ?>
         
         <input type="checkbox" id="show-col-2" class="col-toggle">
         <input type="checkbox" id="show-col-3" class="col-toggle">
@@ -48,7 +182,7 @@
             <label for="show-col-3" class="btn-remove-report label-remove-3">Remove Report</label>
         </div>
 
-        <form action="#" class="report-form-integrated">
+        <form action="" method="POST" enctype="multipart/form-data" class="report-form-integrated">
             <div class="table-wrapper-integrated">
                 <table class="report-table-integrated">
                     <thead>
@@ -62,14 +196,14 @@
                     <tbody>
                         <tr>
                             <td class="label-col">Student NO</td>
-                            <td><input type="text" placeholder="Enter Student NO" required></td>
-                            <td class="report-col-2"><input type="text" placeholder="Enter Student NO"></td>
-                            <td class="report-col-3"><input type="text" placeholder="Enter Student NO"></td>
+                            <td><input type="text" name="student_no" placeholder="Enter Student NO" required></td>
+                            <td class="report-col-2"><input type="text" name="student_no_2" placeholder="Enter Student NO"></td>
+                            <td class="report-col-3"><input type="text" name="student_no_3" placeholder="Enter Student NO"></td>
                         </tr>
                         <tr>
                             <td class="label-col">Residence</td>
                             <td>
-                                <select required>
+                                <select name="residence" required>
                                     <option value="" disabled selected>Select Residence</option>
                                     <option value="Nkandla">Nkandla</option>
                                     <option value="Malema">Malema</option>
@@ -80,7 +214,7 @@
                                 </select>
                             </td>
                             <td class="report-col-2">
-                                <select>
+                                <select name="residence_2">
                                     <option value="" disabled selected>Select Residence</option>
                                     <option value="Nkandla">Nkandla</option>
                                     <option value="Malema">Malema</option>
@@ -91,7 +225,7 @@
                                 </select>
                             </td>
                             <td class="report-col-3">
-                                <select>
+                                <select name="residence_3">
                                     <option value="" disabled selected>Select Residence</option>
                                     <option value="Nkandla">Nkandla</option>
                                     <option value="Malema">Malema</option>
@@ -105,7 +239,7 @@
                         <tr>
                             <td class="label-col">Block NO</td>
                             <td>
-                                <select required>
+                                <select name="block" required>
                                     <option value="" disabled selected>Select Block</option>
                                     <optgroup label="Nkandla">
                                         <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option>
@@ -128,7 +262,7 @@
                                 </select>
                             </td>
                             <td class="report-col-2">
-                                <select>
+                                <select name="block_2">
                                     <option value="" disabled selected>Select Block</option>
                                     <optgroup label="Nkandla">
                                         <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option>
@@ -151,7 +285,7 @@
                                 </select>
                             </td>
                             <td class="report-col-3">
-                                <select>
+                                <select name="block_3">
                                     <option value="" disabled selected>Select Block</option>
                                     <optgroup label="Nkandla">
                                         <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option>
@@ -177,7 +311,7 @@
                         <tr>
                             <td class="label-col">Room NO</td>
                             <td>
-                                <select required>
+                                <select name="room" required>
                                     <option value="" disabled selected>Select Room</option>
                                     <optgroup label="Ground Floor">
                                         <option value="G1">G1</option><option value="G2">G2</option><option value="G3">G3</option><option value="G4">G4</option><option value="G5">G5</option><option value="G6">G6</option><option value="G7">G7</option><option value="G8">G8</option><option value="G9">G9</option><option value="G10">G10</option><option value="G11">G11</option><option value="G12">G12</option>
@@ -191,7 +325,7 @@
                                 </select>
                             </td>
                             <td class="report-col-2">
-                                <select>
+                                <select name="room_2">
                                     <option value="" disabled selected>Select Room</option>
                                     <optgroup label="Ground Floor">
                                         <option value="G1">G1</option><option value="G2">G2</option><option value="G3">G3</option><option value="G4">G4</option><option value="G5">G5</option><option value="G6">G6</option><option value="G7">G7</option><option value="G8">G8</option><option value="G9">G9</option><option value="G10">G10</option><option value="G11">G11</option><option value="G12">G12</option>
@@ -205,7 +339,7 @@
                                 </select>
                             </td>
                             <td class="report-col-3">
-                                <select>
+                                <select name="room_3">
                                     <option value="" disabled selected>Select Room</option>
                                     <optgroup label="Ground Floor">
                                         <option value="G1">G1</option><option value="G2">G2</option><option value="G3">G3</option><option value="G4">G4</option><option value="G5">G5</option><option value="G6">G6</option><option value="G7">G7</option><option value="G8">G8</option><option value="G9">G9</option><option value="G10">G10</option><option value="G11">G11</option><option value="G12">G12</option>
@@ -222,7 +356,7 @@
                         <tr>
                             <td class="label-col">ISSUE</td>
                             <td>
-                                <select required>
+                                <select name="issue" required>
                                     <option value="" disabled selected>Select Issue</option>
                                     <option value="wifi">wifi</option>
                                     <option value="stove">stove</option>
@@ -238,7 +372,7 @@
                                 </select>
                             </td>
                             <td class="report-col-2">
-                                <select>
+                                <select name="issue_2">
                                     <option value="" disabled selected>Select Issue</option>
                                     <option value="wifi">wifi</option>
                                     <option value="stove">stove</option>
@@ -254,7 +388,7 @@
                                 </select>
                             </td>
                             <td class="report-col-3">
-                                <select>
+                                <select name="issue_3">
                                     <option value="" disabled selected>Select Issue</option>
                                     <option value="wifi">wifi</option>
                                     <option value="stove">stove</option>
@@ -273,21 +407,21 @@
                         <tr>
                             <td class="label-col">Gender</td>
                             <td>
-                                <select required>
+                                <select name="gender" required>
                                     <option value="" disabled selected>Select Gender</option>
                                     <option value="F">F</option>
                                     <option value="M">M</option>
                                 </select>
                             </td>
                             <td class="report-col-2">
-                                <select>
+                                <select name="gender_2">
                                     <option value="" disabled selected>Select Gender</option>
                                     <option value="F">F</option>
                                     <option value="M">M</option>
                                 </select>
                             </td>
                             <td class="report-col-3">
-                                <select>
+                                <select name="gender_3">
                                     <option value="" disabled selected>Select Gender</option>
                                     <option value="F">F</option>
                                     <option value="M">M</option>
@@ -296,15 +430,15 @@
                         </tr>
                         <tr>
                             <td class="label-col">Picture</td>
-                            <td><input type="file" accept="image/*"></td>
-                            <td class="report-col-2"><input type="file" accept="image/*"></td>
-                            <td class="report-col-3"><input type="file" accept="image/*"></td>
+                            <td><input type="file" name="picture" accept="image/*"></td>
+                            <td class="report-col-2"><input type="file" name="picture_2" accept="image/*"></td>
+                            <td class="report-col-3"><input type="file" name="picture_3" accept="image/*"></td>
                         </tr>
                         <tr>
                             <td class="label-col">Description</td>
-                            <td><textarea placeholder="Describe the issue..."></textarea></td>
-                            <td class="report-col-2"><textarea placeholder="Describe the issue..."></textarea></td>
-                            <td class="report-col-3"><textarea placeholder="Describe the issue..."></textarea></td>
+                            <td><textarea name="description" placeholder="Describe the issue..."></textarea></td>
+                            <td class="report-col-2"><textarea name="description_2" placeholder="Describe the issue..."></textarea></td>
+                            <td class="report-col-3"><textarea name="description_3" placeholder="Describe the issue..."></textarea></td>
                         </tr>
                     </tbody>
                 </table>
@@ -323,21 +457,21 @@
             </div>
             <div class="footer-column">
                 <div class="footer-column-title">Maintenance Services</div>
-                <a href="about.html">Bulb Replacement</a>
-                <a href="about.html">Window Handle</a>
-                <a href="about.html">Door Handle</a>
-                <a href="about.html">WiFi Problems</a>
-                <a href="about.html">Leakage Problems</a>
-                <a href="about.html">Stove Problem</a>
-                <a href="about.html">HVAC</a>
-                <a href="about.html">Painting</a>
+                <a href="../index.php?page=about">Bulb Replacement</a>
+                <a href="../index.php?page=about">Window Handle</a>
+                <a href="../index.php?page=about">Door Handle</a>
+                <a href="../index.php?page=about">WiFi Problems</a>
+                <a href="../index.php?page=about">Leakage Problems</a>
+                <a href="../index.php?page=about">Stove Problem</a>
+                <a href="../index.php?page=about">HVAC</a>
+                <a href="../index.php?page=about">Painting</a>
             </div>
             <div class="footer-column">
                 <div class="footer-column-title">Quick Navigation</div>
-                <a href="index.html">Home</a>
-                <a href="auth.html#login">Log In</a>
-                <a href="about.html">About</a>
-                <a href="auth.html#signup">Sign Up</a>
+                <a href="../index.php">Home</a>
+                <a href="login.php">Log In</a>
+                <a href="../index.php?page=about">About</a>
+                <a href="register.php">Sign Up</a>
             </div>
             <div class="footer-column">
                 <div class="footer-column-title">Connect with us</div>
@@ -355,7 +489,7 @@
         </div>
         <div class="footer-content">
             <div class="footer-brand">
-                <img src="logo.png" alt="MainRes Logo" class="footer-logo">
+                <img src="../assets/images/logo.png" alt="MainRes Logo" class="footer-logo">
                 <p>&copy; 2026 MainRes Maintenance. All rights reserved.</p>
             </div>
             <div class="footer-links">

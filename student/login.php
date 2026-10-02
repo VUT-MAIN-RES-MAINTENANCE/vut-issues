@@ -1,3 +1,61 @@
+<?php
+require_once '../includes/config.php';
+require_once '../includes/auth.php';
+require_once '../includes/json.php';
+
+$error = '';
+
+// Handle logout
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    logout_user();
+    header('Location: login.php');
+    exit;
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    
+    // Validation
+    if (empty($email) || empty($password)) {
+        $error = 'All fields are required.';
+    } else {
+        // Try to authenticate as student first
+        $user = authenticate_user($email, $password, ROLE_STUDENT);
+        
+        if ($user) {
+            // Login successful as student
+            login_user($user['id'], $user['email'], $user['name'], $user['role']);
+            // Log activity
+            log_activity($user['id'], ROLE_STUDENT, 'login', 'Student logged in: ' . $user['name']);
+            // Redirect to student interface
+            header('Location: index.php');
+            exit;
+        } else {
+            // Try staff
+            $user = authenticate_user($email, $password, ROLE_STAFF);
+            if ($user) {
+                login_user($user['id'], $user['email'], $user['name'], $user['role']);
+                log_activity($user['id'], ROLE_STAFF, 'login', 'Staff logged in: ' . $user['name']);
+                header('Location: ../maintenance/index.php');
+                exit;
+            } else {
+                // Try admin
+                $user = authenticate_user($email, $password, ROLE_ADMIN);
+                if ($user) {
+                    login_user($user['id'], $user['email'], $user['name'], $user['role']);
+                    log_activity($user['id'], ROLE_ADMIN, 'login', 'Admin logged in: ' . $user['name']);
+                    header('Location: ../admin/index.php');
+                    exit;
+                } else {
+                    $error = 'Invalid email or password.';
+                }
+            }
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,12 +63,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sign up or log in to MainRes Maintenance - Get started with your maintenance requests.">
     <meta name="keywords" content="VUT, Login, Sign Up, Maintenance">
-    <title>Get Started - MainRes Maintenance</title>
-    <link rel="icon" type="image/png" href="logo.png">
+    <title>Log In - MainRes Maintenance</title>
+    <link rel="icon" type="image/png" href="../assets/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="auth-page-body">
@@ -19,7 +77,7 @@
         <input type="checkbox" id="nav-toggle" class="nav-toggle-input" aria-label="Toggle navigation menu">
         <label for="nav-toggle" style="display: none;"></label>
         <div class="logo" id="brand-logo">
-            <img src="logo.png" alt="VUT Logo" class="nav-logo">
+            <img src="../assets/images/logo.png" alt="VUT Logo" class="nav-logo">
             VUT MainRes<span>Maintenance</span>
         </div>
         <!-- Toggle Button -->
@@ -29,11 +87,11 @@
             <div class="bar"></div>
         </label>
         <ul class="nav-links" id="nav-links">
-            <li><a href="index.html" id="nav-home">Home</a></li>
-            <li><a href="about.html" class="nav-btn-text" id="nav-about">About</a></li>
-            <li><a href="report.html" class="nav-btn-text" id="nav-report">Report</a></li>
-            <li><a href="auth.html?mode=login" class="nav-btn-text" id="nav-login">Log In</a></li>
-            <li><a href="auth.html?mode=signup" class="nav-btn-primary" id="nav-signup">Sign Up</a></li>
+            <li><a href="../index.php" id="nav-home">Home</a></li>
+            <li><a href="../index.php?page=about" class="nav-btn-text" id="nav-about">About</a></li>
+            <li><a href="report-issue.php" class="nav-btn-text" id="nav-report">Report</a></li>
+            <li><a href="login.php" class="nav-btn-text" id="nav-login">Log In</a></li>
+            <li><a href="register.php" class="nav-btn-primary" id="nav-signup">Sign Up</a></li>
         </ul>
     </nav>
 
@@ -42,55 +100,31 @@
             <!-- Left Side: Form -->
             <div class="auth-form-side">
                 <div class="auth-header">
-                    <a href="index.html" class="auth-logo">
-                        <img src="logo.png" alt="VUT Logo">
+                    <a href="../index.php" class="auth-logo">
+                        <img src="../assets/images/logo.png" alt="VUT Logo">
                         VUT MainRes
                     </a>
                 </div>
                 
-                <div class="auth-content" id="signup-content">
-                    <h1>Get Started Now</h1>
-                    
-                    <form class="modern-form">
-                        <div class="form-group">
-                            <label>Name</label>
-                            <input type="text" placeholder="Enter your name" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Email address</label>
-                            <input type="email" placeholder="Enter your email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" placeholder="Min. 8 characters" required>
-                        </div>
-                        
-                        <div class="form-checkbox">
-                            <input type="checkbox" id="terms" required>
-                            <label for="terms">I agree to the <span>terms & policy</span></label>
-                        </div>
-                        
-                        <button type="submit" class="auth-submit-btn">Sign Up</button>
-                    </form>
-                    
-                    <p class="auth-footer-text">have an account? <a href="javascript:void(0)" id="show-login">Login</a></p>
-                </div>
-
-                <!-- Log In Content (Hidden by default) -->
-                <div class="auth-content" id="login-content" style="display: none;">
+                <!-- Log In Content -->
+                <div class="auth-content" id="login-content" style="display: flex;">
                     <h1>Welcome Back</h1>
                     
-                    <form class="modern-form">
+                    <?php if ($error): ?>
+                        <div class="error-message" style="color: #ef4444; margin-bottom: 1rem; padding: 0.5rem; background: rgba(239, 68, 68, 0.1); border-radius: 4px;">
+                            <?php echo htmlspecialchars($error); ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <form class="modern-form" method="POST" action="">
                         <div class="form-group">
                             <label>Email address</label>
-                            <input type="email" placeholder="Enter your email" required>
+                            <input type="email" name="email" placeholder="Enter your email" required>
                         </div>
                         
                         <div class="form-group">
                             <label>Password</label>
-                            <input type="password" placeholder="Enter your password" required>
+                            <input type="password" name="password" placeholder="Enter your password" required>
                         </div>
                         
                         <div class="form-checkbox">
@@ -101,13 +135,13 @@
                         <button type="submit" class="auth-submit-btn">Log In</button>
                     </form>
                     
-                    <p class="auth-footer-text">Don't have an account? <a href="javascript:void(0)" id="show-signup">Sign Up</a></p>
+                    <p class="auth-footer-text">Don't have an account? <a href="register.php">Sign Up</a></p>
                 </div>
             </div>
 
             <!-- Right Side: Image -->
             <div class="auth-image-side">
-                <img src="Loginfix.png" alt="VUT MainRes Background" class="side-img">
+                <img src="../assets/images/Loginfix.png" alt="VUT MainRes Background" class="side-img">
             </div>
         </div>
     </div>
@@ -120,21 +154,21 @@
             </div>
             <div class="footer-column">
                 <div class="footer-column-title">Maintenance Services</div>
-                <a href="about.html">Bulb Replacement</a>
-                <a href="about.html">Window Handle</a>
-                <a href="about.html">Door Handle</a>
-                <a href="about.html">WiFi Problems</a>
-                <a href="about.html">Leakage Problems</a>
-                <a href="about.html">Stove Problem</a>
-                <a href="about.html">HVAC</a>
-                <a href="about.html">Painting</a>
+                <a href="../index.php?page=about">Bulb Replacement</a>
+                <a href="../index.php?page=about">Window Handle</a>
+                <a href="../index.php?page=about">Door Handle</a>
+                <a href="../index.php?page=about">WiFi Problems</a>
+                <a href="../index.php?page=about">Leakage Problems</a>
+                <a href="../index.php?page=about">Stove Problem</a>
+                <a href="../index.php?page=about">HVAC</a>
+                <a href="../index.php?page=about">Painting</a>
             </div>
             <div class="footer-column">
                 <div class="footer-column-title">Quick Navigation</div>
-                <a href="index.html">Home</a>
-                <a href="auth.html">Log In</a>
-                <a href="about.html">About</a>
-                <a href="auth.html">Sign Up</a>
+                <a href="../index.php">Home</a>
+                <a href="login.php">Log In</a>
+                <a href="../index.php?page=about">About</a>
+                <a href="register.php">Sign Up</a>
             </div>
             <div class="footer-column">
                 <div class="footer-column-title">Connect with us</div>
@@ -152,7 +186,7 @@
         </div>
         <div class="footer-content">
             <div class="footer-brand">
-                <img src="logo.png" alt="MainRes Logo" class="footer-logo">
+                <img src="../assets/images/logo.png" alt="MainRes Logo" class="footer-logo">
                 <p>&copy; 2026 MainRes Maintenance. All rights reserved.</p>
             </div>
             <div class="footer-links">
@@ -161,34 +195,5 @@
             </div>
         </div>
     </footer>
-
-    <script>
-        const signupContent = document.getElementById('signup-content');
-        const loginContent = document.getElementById('login-content');
-        const showLoginBtn = document.getElementById('show-login');
-        const showSignupBtn = document.getElementById('show-signup');
-
-        function toggleAuth(mode) {
-            if (mode === 'login') {
-                signupContent.style.display = 'none';
-                loginContent.style.display = 'flex';
-                document.title = "Log In - MainRes Maintenance";
-            } else {
-                loginContent.style.display = 'none';
-                signupContent.style.display = 'flex';
-                document.title = "Get Started - MainRes Maintenance";
-            }
-        }
-
-        showLoginBtn.addEventListener('click', () => toggleAuth('login'));
-        showSignupBtn.addEventListener('click', () => toggleAuth('signup'));
-
-        // Check URL parameters zfor mode
-        const urlParams = new URLSearchParams(window.location.search);
-        const mode = urlParams.get('mode');
-        if (mode === 'login') {
-            toggleAuth('login');
-        }
-    </script>
 </body>
 </html>

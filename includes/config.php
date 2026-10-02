@@ -1,0 +1,50 @@
+<?php
+/**
+ * Configuration File
+ * Shared configuration settings for the VUT Residence Maintenance System
+ * IMPORTANT: Changes to this file affect ALL interfaces (Student, Maintenance, Admin)
+ */
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Define base paths
+define('BASE_PATH', dirname(__DIR__));
+define('DATA_PATH', BASE_PATH . '/data');
+define('PICTURES_PATH', BASE_PATH . '/pictures');
+define('INCLUDES_PATH', BASE_PATH . '/includes');
+
+// JSON file paths
+define('STUDENTS_FILE', DATA_PATH . '/students.json');
+define('STAFF_FILE', DATA_PATH . '/staff.json');
+define('ADMINS_FILE', DATA_PATH . '/admins.json');
+define('MAINTENANCE_REQUESTS_FILE', DATA_PATH . '/maintenance_requests.json');
+define('ACTIVITIES_FILE', DATA_PATH . '/activities.json');
+define('SETTINGS_FILE', DATA_PATH . '/settings.json');
+
+// Picture folder paths
+define('ISSUES_PICTURE_PATH', PICTURES_PATH . '/issues');
+
+// User roles
+define('ROLE_STUDENT', 'student');
+define('ROLE_STAFF', 'staff');
+define('ROLE_ADMIN', 'admin');
+
+// Session keys
+define('SESSION_USER_ID', 'user_id');
+define('SESSION_USER_ROLE', 'user_role');
+define('SESSION_USER_EMAIL', 'user_email');
+define('SESSION_USER_NAME', 'user_name');
+
+// Issue statuses
+define('STATUS_PENDING', 'pending');
+define('STATUS_ASSIGNED', 'assigned');
+define('STATUS_IN_PROGRESS', 'in_progress');
+define('STATUS_COMPLETED', 'completed');
+
+// Allowed image file types
+define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/jpg']);
+define('MAX_IMAGE_SIZE', 5 * 1024 * 1024); // 5MB
+

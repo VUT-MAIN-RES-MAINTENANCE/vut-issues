@@ -1,0 +1,38 @@
+[
+    {
+        "id": "activity_6abf812d70a9a0f9b7b92",
+        "user_id": "student_6abf812c60bac9cb133dc",
+        "role": "student",
+        "action": "register",
+        "description": "Student registered: Andzani Singh",
+        "related_issue": null,
+        "timestamp": "2026-10-02 10:02:21"
+    },
+    {
+        "id": "activity_6abf846c0eed4e0e1f311",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "register",
+        "description": "Student registered: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-02 10:16:12"
+    },
+    {
+        "id": "activity_6abf8470d223b26f1cf77",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-02 10:16:16"
+    },
+    {
+        "id": "activity_6abf847ba932b6707d7c0",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-02 10:16:27"
+    }
+]

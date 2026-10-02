@@ -1,63 +1,80 @@
+<?php
+require_once '../includes/config.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="MainRes Maintenance - Premium maintenance services at your fingertips. Report and manage your services easily.">
-    <meta name="keywords" content="Maintenance, Services, MainRes, Property Management">
-    <meta name="author" content="Student Project">
-    <title>MainRes Maintenance - Home</title>
-    
-    <link rel="icon" type="image/png" href="logo.png">
-    
+    <meta name="description" content="Maintenance Staff Login - MainRes Maintenance">
+    <meta name="keywords" content="VUT, Maintenance Staff, Login">
+    <title>Maintenance Staff Login - MainRes Maintenance</title>
+    <link rel="icon" type="image/png" href="../assets/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="styles.css">
-    
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Firebase SDK -->
-    <script type="module" src="firebase-setup.js"></script>
 </head>
-<body class="home-page">
-    <!-- Navigation -->
+<body class="auth-page-body">
     <nav class="navbar" id="main-nav">
-        <input type="checkbox" id="nav-toggle" class="nav-toggle-input" aria-label="Toggle navigation menu" title="Toggle navigation menu">
+        <input type="checkbox" id="nav-toggle" class="nav-toggle-input" aria-label="Toggle navigation menu">
+        <label for="nav-toggle" style="display: none;"></label>
         <div class="logo" id="brand-logo">
-            <img src="logo.png" alt="VUT Logo" class="nav-logo">
+            <img src="../assets/images/logo.png" alt="VUT Logo" class="nav-logo">
             VUT MainRes<span>Maintenance</span>
         </div>
-        <!-- Toggle Button -->
         <label for="nav-toggle" class="menu-toggle-btn" id="mobile-menu-toggle">
             <div class="bar"></div>
             <div class="bar"></div>
             <div class="bar"></div>
         </label>
         <ul class="nav-links" id="nav-links">
-            <li><a href="index.html" id="nav-home">Home</a></li>
-            <li><a href="about.html" class="nav-btn-text" id="nav-about">About</a></li>
-            <li><a href="report.html" class="nav-btn-text" id="nav-report">Report</a></li>
-            <li><a href="auth.html#login" class="nav-btn-text" id="nav-login">Log In</a></li>
-            <li><a href="auth.html#signup" class="nav-btn-primary" id="nav-signup">Sign Up</a></li>
+            <li><a href="../index.php" id="nav-home">Home</a></li>
         </ul>
     </nav>
 
-    <!-- Main Hero Section -->
-    <main class="hero" id="home">
-        <div class="hero-container">
-            <div class="hero-content">
-                <h1>Premium Maintenance<br>At Your Fingertips</h1>
-                <p>Experience hassle-free, top-tier maintenance services for VUT Main Residence. We handle the hard work so you can focus on your studies.</p>
-                <div class="hero-buttons">
-                    <a href="report.html" class="btn btn-primary" id="btn-services">Report</a>
-                    <a href="about.html" class="btn btn-secondary" id="btn-about">About Us</a>
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            <div class="auth-form-side">
+                <div class="auth-header">
+                    <a href="../index.php" class="auth-logo">
+                        <img src="../assets/images/logo.png" alt="VUT Logo">
+                        VUT MainRes
+                    </a>
+                </div>
+                
+                <div class="auth-content" style="display: flex;">
+                    <h1>Maintenance Staff Login</h1>
+                    
+                    <?php if ($error): ?>
+                        <div class="error-message" style="color: #ef4444; margin-bottom: 1rem; padding: 0.5rem; background: rgba(239, 68, 68, 0.1); border-radius: 4px;">
+                            <?php echo htmlspecialchars($error); ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <form class="modern-form" method="POST" action="">
+                        <div class="form-group">
+                            <label>Email address</label>
+                            <input type="email" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" placeholder="Enter your password" required>
+                        </div>
+                        
+                        <button type="submit" class="auth-submit-btn">Log In</button>
+                    </form>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <!-- Footer Area -->
+            <div class="auth-image-side">
+                <img src="../assets/images/Loginfix.png" alt="VUT MainRes Background" class="side-img">
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="footer-services">
             <div class="footer-column">
@@ -65,22 +82,8 @@
                 <p class="footer-column-text">We offer a wide range of premium maintenance services to keep your property in perfect condition.</p>
             </div>
             <div class="footer-column">
-                <div class="footer-column-title">Maintenance Services</div>
-                <a href="about.html">Bulb Replacement</a>
-                <a href="about.html">Window Handle</a>
-                <a href="about.html">Door Handle</a>
-                <a href="about.html">WiFi Problems</a>
-                <a href="about.html">Leakage Problems</a>
-                <a href="about.html">Stove Problem</a>
-                <a href="about.html">HVAC</a>
-                <a href="about.html">Painting</a>
-            </div>
-            <div class="footer-column">
                 <div class="footer-column-title">Quick Navigation</div>
-                <a href="index.html">Home</a>
-                <a href="auth.html#login">Log In</a>
-                <a href="about.html">About</a>
-                <a href="auth.html#signup">Sign Up</a>
+                <a href="../index.php">Home</a>
             </div>
             <div class="footer-column">
                 <div class="footer-column-title">Connect with us</div>
@@ -98,11 +101,10 @@
         </div>
         <div class="footer-content">
             <div class="footer-brand">
-                <img src="logo.png" alt="MainRes Logo" class="footer-logo">
+                <img src="../assets/images/logo.png" alt="MainRes Logo" class="footer-logo">
                 <p>&copy; 2026 MainRes Maintenance. All rights reserved.</p>
             </div>
             <div class="footer-links">
-                <!-- E-mail Hyperlink -->
                 <a href="mailto:vut@mainresmaintenance.com" class="footer-link">vut@mainresmaintenance.com</a>
             </div>
         </div>
