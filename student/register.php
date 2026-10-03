@@ -3,6 +3,11 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: login.php?mode=signup');
+    exit;
+}
+
 $error = '';
 $success = '';
 

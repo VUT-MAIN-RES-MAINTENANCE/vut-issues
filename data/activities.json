@@ -34,5 +34,68 @@
         "description": "Student logged in: Mavangwa",
         "related_issue": null,
         "timestamp": "2026-10-02 10:16:27"
+    },
+    {
+        "id": "activity_6ac0c9fac5e5c02f3e5a9",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-03 09:25:14"
+    },
+    {
+        "id": "activity_6ac0ca08146ecfdb44bc7",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-03 09:25:28"
+    },
+    {
+        "id": "activity_6ac0cd96af7857525603f",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-03 09:40:38"
+    },
+    {
+        "id": "activity_6ac0d43073636126c67f4",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-03 10:08:48"
+    },
+    {
+        "id": "activity_6ac0d4f183020f94f216d",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-03 10:12:01"
+    },
+    {
+        "id": "activity_6ac0d5847246f388d75d7",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-03 10:14:28"
+    },
+    {
+        "id": "activity_6ac0dbcb73365fd06a5fa",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-03 10:41:15"
     }
 ]

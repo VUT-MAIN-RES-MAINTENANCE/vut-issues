@@ -150,8 +150,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <li><a href="../index.php">Home</a></li>
             <li><a href="../index.php?page=about">About</a></li>
             <li><a href="report-issue.php">Report</a></li>
-            <li><a href="my-issues.php" class="nav-btn-text">My Issues</a></li>
-            <li><a href="profile.php" class="nav-btn-text">Profile</a></li>
             <li><a href="login.php?action=logout" class="nav-btn-primary">Log Out</a></li>
         </ul>
     </nav>
