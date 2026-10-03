@@ -7,7 +7,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="MainRes Maintenance - Premium maintenance services at your fingertips. Report and manage your services easily.">
+    <meta name="description" content="Report maintenance issues at VUT Main Residence and get help keeping your living space in good shape.">
     <meta name="keywords" content="Maintenance, Services, MainRes, Property Management">
     <meta name="author" content="Student Project">
     <title>MainRes Maintenance - Home</title>
@@ -16,9 +16,9 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=<?php echo filemtime(__DIR__ . '/assets/css/styles.css'); ?>">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -50,15 +50,29 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
     <main class="hero" id="home">
         <div class="hero-container">
             <div class="hero-content">
-                <h1>Premium Maintenance<br>At Your Fingertips</h1>
-                <p>Experience hassle-free, top-tier maintenance services for VUT Main Residence. We handle the hard work so you can focus on your studies.</p>
-                <div class="hero-buttons">
-                    <a href="student/report-issue.php" class="btn btn-primary" id="btn-services">Report</a>
-                    <a href="index.php?page=about" class="btn btn-secondary" id="btn-about">About Us</a>
-                </div>
+                <p class="hero-kicker"><span></span>STUDENT RESIDENCE MAINTENANCE</p>
+                <h1>A better stay.<br><span>Starts here.</span></h1>
+                <p>Report a repair at VUT Main Residence and get the right help for the place you call home.</p>
             </div>
         </div>
+        <div class="hero-buttons">
+            <a href="student/report-issue.php" class="btn btn-primary" id="btn-services">Report issue <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="index.php?page=about" class="btn btn-secondary" id="btn-about">About VUT</a>
+        </div>
     </main>
+    <section class="home-service-strip" aria-labelledby="home-service-title">
+        <div class="home-service-inner">
+            <div class="home-service-heading">
+                <span>HERE WHEN YOU NEED US</span>
+                <h2 id="home-service-title">What needs attention?</h2>
+            </div>
+            <div class="home-service-links">
+                <a href="student/report-issue.php"><i class="fas fa-faucet" aria-hidden="true"></i><span>Leaks &amp; plumbing</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php"><i class="fas fa-bolt" aria-hidden="true"></i><span>Electrical</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php"><i class="fas fa-door-open" aria-hidden="true"></i><span>Doors &amp; fittings</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+            </div>
+        </div>
+    </section>
     <?php elseif ($page == 'about'): ?>
     <div class="about-hero-banner">
         <span class="banner-badge">About Us</span>
