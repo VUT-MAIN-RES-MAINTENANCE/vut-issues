@@ -1,0 +1,670 @@
+.about-page {
+    --about-ink: #142b45;
+    --about-muted: #5e7186;
+    --about-paper: #f3f7fb;
+    --about-line: #dce6ef;
+    --about-blue: #1d5fa7;
+    --about-sky: #8bd3ff;
+    background: var(--about-paper);
+    color: var(--about-ink);
+    font-family: 'Manrope', sans-serif;
+}
+
+.about-page .about-main {
+    padding-top: 82px;
+    overflow: hidden;
+}
+
+.about-page .navbar .logo,
+.about-page .navbar .logo span {
+    color: #fff;
+}
+
+.about-page .about-hero,
+.about-page .about-story,
+.about-page .about-principles,
+.about-page .about-services {
+    width: min(1240px, calc(100% - 10vw));
+    margin-inline: auto;
+}
+
+.about-page .about-hero {
+    min-height: 620px;
+    padding: 72px 0 92px;
+    position: relative;
+    display: grid;
+    grid-template-columns: 0.92fr 1.08fr;
+    align-items: center;
+    gap: clamp(36px, 7vw, 100px);
+}
+
+.about-page .about-hero-copy {
+    position: relative;
+    z-index: 2;
+}
+
+.about-page .about-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--about-blue);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+}
+
+.about-page .about-eyebrow > span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4c9ae8;
+    box-shadow: 0 0 0 4px rgba(76, 154, 232, 0.16);
+}
+
+.about-page .about-hero h1 {
+    max-width: 620px;
+    margin: 24px 0 20px;
+    color: var(--about-ink);
+    font-size: clamp(3.25rem, 6vw, 5.65rem);
+    font-weight: 800;
+    line-height: 0.99;
+}
+
+.about-page .about-hero h1 em,
+.about-page .about-story h2 em {
+    color: var(--about-blue);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
+}
+
+.about-page .about-hero-copy > p {
+    max-width: 470px;
+    margin: 0;
+    color: var(--about-muted);
+    font-size: 1.02rem;
+    line-height: 1.8;
+}
+
+.about-page .about-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin-top: 34px;
+}
+
+.about-page .about-button {
+    min-height: 50px;
+    padding: 0 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 800;
+    transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.about-page .about-button:hover {
+    transform: translateY(-2px);
+}
+
+.about-page .about-button-primary {
+    background: var(--about-blue);
+    color: #fff;
+}
+
+.about-page .about-button-primary:hover {
+    background: var(--about-ink);
+}
+
+.about-page .about-text-link,
+.about-page .about-inline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--about-ink);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.about-page .about-text-link:hover,
+.about-page .about-inline-link:hover {
+    color: var(--about-blue);
+}
+
+.about-page .about-hero-visual {
+    position: relative;
+    min-width: 0;
+    padding: 0 0 34px 34px;
+}
+
+.about-page .about-hero-visual::before {
+    content: '';
+    position: absolute;
+    inset: 34px 34px 0 0;
+    background: var(--about-sky);
+}
+
+.about-page .about-hero-visual img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 430px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.about-page .about-photo-caption {
+    position: absolute;
+    right: 34px;
+    bottom: 34px;
+    left: 34px;
+    min-height: 54px;
+    padding: 0 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    background: rgba(20, 44, 38, 0.88);
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 1.1px;
+}
+
+.about-page .about-photo-caption i {
+    color: var(--about-sky);
+}
+
+.about-page .about-years {
+    position: absolute;
+    top: 4px;
+    right: -20px;
+    width: 154px;
+    min-height: 112px;
+    padding: 17px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--about-ink);
+    background: white;
+    box-shadow: 0 12px 35px rgba(20, 44, 38, 0.12);
+}
+
+.about-page .about-years strong {
+    font-size: 2.2rem;
+    line-height: 1;
+}
+
+.about-page .about-years strong span {
+    color: var(--about-blue);
+}
+
+.about-page .about-years > span {
+    color: var(--about-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.about-page .about-hero-index {
+    position: absolute;
+    right: 0;
+    bottom: 33px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--about-muted);
+    font-size: 0.65rem;
+    font-weight: 800;
+}
+
+.about-page .about-hero-index span {
+    width: 45px;
+    height: 1px;
+    background: #a9bfd4;
+}
+
+.about-page .about-story {
+    padding: 92px 0 98px;
+    display: grid;
+    grid-template-columns: 1fr 0.75fr;
+    gap: clamp(45px, 11vw, 150px);
+    border-top: 1px solid var(--about-line);
+}
+
+.about-page .about-story h2 {
+    margin: 19px 0 0;
+    color: var(--about-ink);
+    font-size: clamp(2.3rem, 4vw, 3.7rem);
+    font-weight: 800;
+    line-height: 1.08;
+}
+
+.about-page .about-story-copy {
+    padding-top: 28px;
+}
+
+.about-page .about-story-copy p {
+    margin: 0 0 17px;
+    color: var(--about-muted);
+    font-size: 0.95rem;
+    line-height: 1.85;
+}
+
+.about-page .about-story-copy .about-inline-link {
+    margin-top: 8px;
+    color: var(--about-blue);
+}
+
+.about-page .about-principles {
+    margin-bottom: 108px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.82fr;
+    border: 1px solid var(--about-line);
+}
+
+.about-page .about-principle {
+    min-height: 255px;
+    padding: 28px 30px;
+    position: relative;
+    border-right: 1px solid var(--about-line);
+}
+
+.about-page .about-principle-number {
+    display: block;
+    color: var(--about-muted);
+    font-size: 0.63rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.about-page .about-principle > i {
+    margin-top: 30px;
+    color: var(--about-blue);
+    font-size: 1.25rem;
+}
+
+.about-page .about-principle h3 {
+    margin: 13px 0 9px;
+    color: var(--about-ink);
+    font-size: 1.25rem;
+    line-height: 1.25;
+}
+
+.about-page .about-principle p {
+    max-width: 290px;
+    margin: 0;
+    color: var(--about-muted);
+    font-size: 0.82rem;
+    line-height: 1.7;
+}
+
+.about-page .about-principle-note {
+    color: white;
+    background: var(--about-blue);
+    border-right: 0;
+}
+
+.about-page .about-principle-note .about-principle-number {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.about-page .about-principle-note p {
+    margin-top: 32px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1.65;
+}
+
+.about-page .about-principle-note a {
+    position: absolute;
+    right: 28px;
+    bottom: 27px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    color: var(--about-ink);
+    background: var(--about-sky);
+    text-decoration: none;
+}
+
+.about-page .about-services {
+    padding-bottom: 100px;
+}
+
+.about-page .about-services-heading {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.about-page .about-services-heading h2 {
+    margin: 13px 0 0;
+    color: var(--about-ink);
+    font-size: clamp(2rem, 3.5vw, 3.15rem);
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.about-page .about-services-heading > .about-inline-link {
+    padding-bottom: 6px;
+    color: var(--about-blue);
+    white-space: nowrap;
+}
+
+.about-page .about-service-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--about-line);
+}
+
+.about-page .about-service-item {
+    min-width: 0;
+    min-height: 78px;
+    padding: 12px 18px 12px 4px;
+    display: grid;
+    grid-template-columns: 28px 25px minmax(0, 1fr) 16px;
+    align-items: center;
+    gap: 10px;
+    color: var(--about-ink);
+    border-bottom: 1px solid var(--about-line);
+    text-decoration: none;
+    transition: background-color 180ms ease, padding 180ms ease;
+}
+
+.about-page .about-service-item:hover {
+    padding-left: 12px;
+    background: #e7f1fb;
+}
+
+.about-page .about-service-item > span {
+    color: #8496aa;
+    font-size: 0.63rem;
+    font-weight: 800;
+}
+
+.about-page .about-service-item > i:first-of-type {
+    color: var(--about-blue);
+    font-size: 0.9rem;
+}
+
+.about-page .about-service-item strong {
+    overflow-wrap: anywhere;
+    font-size: 0.79rem;
+    font-weight: 800;
+}
+
+.about-page .about-service-item > i:last-child {
+    color: #8294a8;
+    font-size: 0.65rem;
+}
+
+.about-page .about-response-row {
+    margin-top: 66px;
+    padding: 28px 30px;
+    display: grid;
+    grid-template-columns: 52px 1fr 1.15fr auto;
+    align-items: center;
+    gap: 22px;
+    color: white;
+    background: var(--about-ink);
+}
+
+.about-page .about-response-mark {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    color: var(--about-ink);
+    background: var(--about-sky);
+}
+
+.about-page .about-response-row > div:nth-child(2) > span {
+    color: var(--about-sky);
+    font-size: 0.59rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.about-page .about-response-row h3 {
+    margin: 7px 0 0;
+    font-size: 1.05rem;
+    line-height: 1.35;
+}
+
+.about-page .about-response-row > p {
+    margin: 0;
+    color: #c5d6e5;
+    font-size: 0.75rem;
+    line-height: 1.65;
+}
+
+.about-page .about-button-dark {
+    color: var(--about-ink);
+    background: var(--about-sky);
+    white-space: nowrap;
+}
+
+.about-page .about-button-dark:hover {
+    color: white;
+    background: var(--about-blue);
+}
+
+.about-page [data-reveal] {
+    opacity: 1;
+    transform: none;
+}
+
+.about-page.about-motion-ready [data-reveal] {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 550ms ease, transform 550ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.about-page.about-motion-ready [data-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+    .about-page .about-hero {
+        min-height: 0;
+        grid-template-columns: 1fr 0.9fr;
+        gap: 36px;
+    }
+
+    .about-page .about-hero h1 {
+        font-size: clamp(3rem, 6vw, 4.5rem);
+    }
+
+    .about-page .about-hero-visual img {
+        height: 360px;
+    }
+
+    .about-page .about-years {
+        right: -12px;
+        width: 140px;
+    }
+
+    .about-page .about-principle {
+        padding: 24px 20px;
+    }
+
+    .about-page .about-response-row {
+        grid-template-columns: 52px 1fr 1fr;
+    }
+
+    .about-page .about-response-row .about-button {
+        grid-column: 2 / -1;
+        justify-self: start;
+    }
+}
+
+@media (max-width: 680px) {
+    .about-page .about-main {
+        padding-top: 72px;
+    }
+
+    .about-page .about-hero,
+    .about-page .about-story,
+    .about-page .about-principles,
+    .about-page .about-services {
+        width: min(100% - 40px, 520px);
+    }
+
+    .about-page .about-hero {
+        padding: 58px 0 64px;
+        grid-template-columns: 1fr;
+        gap: 44px;
+    }
+
+    .about-page .about-hero h1 {
+        margin-top: 20px;
+        font-size: clamp(3rem, 12vw, 4.2rem);
+    }
+
+    .about-page .about-hero-copy > p {
+        max-width: 440px;
+        font-size: 0.94rem;
+    }
+
+    .about-page .about-actions {
+        gap: 18px;
+    }
+
+    .about-page .about-hero-visual {
+        padding: 0 0 25px 20px;
+    }
+
+    .about-page .about-hero-visual::before {
+        inset: 22px 20px 0 0;
+    }
+
+    .about-page .about-hero-visual img {
+        height: min(84vw, 390px);
+    }
+
+    .about-page .about-photo-caption {
+        right: 20px;
+        bottom: 25px;
+        left: 20px;
+        min-height: 45px;
+        font-size: 0.55rem;
+    }
+
+    .about-page .about-years {
+        top: -17px;
+        right: -4px;
+        width: 130px;
+        min-height: 86px;
+        padding: 12px;
+    }
+
+    .about-page .about-years strong {
+        font-size: 1.8rem;
+    }
+
+    .about-page .about-hero-index {
+        right: 0;
+        bottom: 12px;
+    }
+
+    .about-page .about-story {
+        padding: 64px 0 70px;
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .about-page .about-story h2 {
+        font-size: 2.55rem;
+    }
+
+    .about-page .about-story-copy {
+        padding-top: 5px;
+    }
+
+    .about-page .about-principles {
+        margin-bottom: 70px;
+        grid-template-columns: 1fr;
+    }
+
+    .about-page .about-principle {
+        min-height: 220px;
+        border-right: 0;
+        border-bottom: 1px solid var(--about-line);
+    }
+
+    .about-page .about-principle-note {
+        min-height: 200px;
+        border-bottom: 0;
+    }
+
+    .about-page .about-principle > i {
+        margin-top: 24px;
+    }
+
+    .about-page .about-principle-note p {
+        margin-top: 22px;
+    }
+
+    .about-page .about-services {
+        padding-bottom: 68px;
+    }
+
+    .about-page .about-services-heading {
+        align-items: start;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .about-page .about-services-heading h2 {
+        font-size: 2.25rem;
+    }
+
+    .about-page .about-service-list {
+        grid-template-columns: 1fr;
+    }
+
+    .about-page .about-service-item {
+        min-height: 68px;
+    }
+
+    .about-page .about-response-row {
+        margin-top: 46px;
+        padding: 23px;
+        grid-template-columns: 48px 1fr;
+        gap: 15px;
+    }
+
+    .about-page .about-response-row > p,
+    .about-page .about-response-row .about-button {
+        grid-column: 1 / -1;
+    }
+
+    .about-page .about-response-row > p {
+        font-size: 0.8rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-page *,
+    .about-page *::before,
+    .about-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+
+    .about-page.about-motion-ready [data-reveal] {
+        opacity: 1;
+        transform: none;
+    }
+}

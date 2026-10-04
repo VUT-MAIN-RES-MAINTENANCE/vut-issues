@@ -97,5 +97,23 @@
         "description": "Student logged in: Mavangwa",
         "related_issue": null,
         "timestamp": "2026-10-03 10:41:15"
+    },
+    {
+        "id": "activity_6ac17be0afeac947a0526",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-03 22:04:16"
+    },
+    {
+        "id": "activity_6ac2178b29b784031bf57",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-04 09:08:27"
     }
 ]
