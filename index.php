@@ -19,10 +19,13 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="assets/css/styles.css?v=<?php echo filemtime(__DIR__ . '/assets/css/styles.css'); ?>">
+    <?php if ($page == 'about'): ?>
+    <link rel="stylesheet" href="assets/css/about.css?v=<?php echo filemtime(__DIR__ . '/assets/css/about.css'); ?>">
+    <?php endif; ?>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="home-page">
+<body class="home-page<?php echo $page == 'about' ? ' about-page' : ''; ?>">
     <!-- Navigation -->
     <nav class="navbar" id="main-nav">
         <input type="checkbox" id="nav-toggle" class="nav-toggle-input" aria-label="Toggle navigation menu" title="Toggle navigation menu">
@@ -74,93 +77,81 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
         </div>
     </section>
     <?php elseif ($page == 'about'): ?>
-    <div class="about-hero-banner">
-        <span class="banner-badge">About Us</span>
-        <h1>Keeping VUT Residences Safe and Comfortable</h1>
-        <p>The VUT Maintenance website helps residence students quickly report maintenance problems and connect with experienced repair teams</p>
-    </div>
-
-    <section class="about-section page-container">
-        <div class="about-layout">
-            <div class="about-content">
-                <span class="badge">Our Background</span>
-                <h2>Dedicated to Your Comfort</h2>
-                <p class="about-lead">VUT MainRes Maintenance, based in Vanderbijlpark 1911, Gauteng, keeps student
-				residences safe, clean, and comfortable. With over 20 years of experience, the team handles plumbing,
-				electrical, general building repairs, and emergency support — delivering fast, professional service 
-				to the VUT student community.</p>
-                
-                <div class="vision-mission-grid">
-                    <div class="vision-mission-card">
-                        <div class="vm-icon"><i class="fas fa-eye"></i></div>
-                        <div class="vm-text">
-                            <h4>Vision</h4>
-                            <p>A safe, comfortable, worry-free home for every VUT student.</p>
-                        </div>
-                    </div>
-                    <div class="vision-mission-card">
-                        <div class="vm-icon"><i class="fas fa-bullseye"></i></div>
-                        <div class="vm-text">
-                            <h4>Mission</h4>
-                            <p>Fix residence issues fast and right — so students can focus on studying.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="about-features">
-                    <div class="about-feature">
-                        <div class="feature-icon"><i class="fas fa-clock"></i></div>
-                        <div class="feature-text">
-                            <h4>24/7 Support</h4>
-                            <p>Emergency repairs available around the clock.</p>
-                        </div>
-                    </div>
-                    <div class="about-feature">
-                        <div class="feature-icon"><i class="fas fa-tools"></i></div>
-                        <div class="feature-text">
-                            <h4>Expert Repairs</h4>
-                            <p>Qualified professionals for all maintenance needs.</p>
-                        </div>
-                    </div>
-                    <div class="about-feature">
-                        <div class="feature-icon"><i class="fas fa-check-circle"></i></div>
-                        <div class="feature-text">
-                            <h4>Fast Response</h4>
-                            <p>We aim to resolve most issues within 24 hours.</p>
-                        </div>
-                    </div>
+    <main class="about-main">
+        <section class="about-hero" aria-labelledby="about-title">
+            <div class="about-hero-copy" data-reveal>
+                <span class="about-eyebrow"><span></span> VUT MAIN RESIDENCE · VAAL</span>
+                <h1 id="about-title">A better stay<br>starts with <em>care.</em></h1>
+                <p>We keep student residences working, safe, and comfortable, with a maintenance team that is ready when you need us.</p>
+                <div class="about-actions">
+                    <a class="about-button about-button-primary" href="student/report-issue.php">Report an issue <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                    <a class="about-text-link" href="#about-services">Explore our services <i class="fas fa-arrow-down" aria-hidden="true"></i></a>
                 </div>
             </div>
-            <div class="about-image-container">
-                <div class="image-wrapper">
-                    <img src="assets/images/Fix.png" alt="Maintenance Team at Work" class="about-image">
-                    <div class="experience-card">
-                        <span class="exp-number">20+</span>
-                        <span class="exp-text">Years of Excellence</span>
-                    </div>
-                </div>
+            <div class="about-hero-visual" data-reveal>
+                <img src="assets/images/Fix.png" alt="A maintenance professional repairing a residence window">
+                <div class="about-photo-caption"><span>HERE FOR THE EVERYDAY FIXES</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></div>
+                <div class="about-years"><strong>20<span>+</span></strong><span>years caring<br>for VUT residences</span></div>
             </div>
-        </div>
+            <div class="about-hero-index" aria-hidden="true">01 <span></span> 03</div>
+        </section>
 
-        <!-- New Services List (No Cards) -->
-        <div class="services-list-container">
-            <h2 class="section-title">Our Maintenance Services</h2>
-            <div class="services-simple-list">
-                <div class="service-item"><i class="fas fa-pipe"></i> Plumbing</div>
-                <div class="service-item"><i class="fas fa-lightbulb"></i> Bulb Replacement</div>
-                <div class="service-item"><i class="fas fa-window-maximize"></i> Window Handle</div>
-                <div class="service-item"><i class="fas fa-door-open"></i> Door Handle</div>
-                <div class="service-item"><i class="fas fa-wifi"></i> WiFi Problems</div>
-                <div class="service-item"><i class="fas fa-tint-slash"></i> Leakage Problems</div>
-                <div class="service-item"><i class="fas fa-fire-burner"></i> Stove Problem</div>
-                <div class="service-item"><i class="fas fa-wind"></i> HVAC</div>
-                <div class="service-item"><i class="fas fa-plug"></i> Plugs</div>
-                <div class="service-item"><i class="fas fa-bed"></i> Bed</div>
-                <div class="service-item"><i class="fas fa-chair"></i> Chair</div>
-                <div class="service-item"><i class="fas fa-paint-roller"></i> Painting</div>
+        <section class="about-story" aria-labelledby="about-story-title">
+            <div class="about-story-heading" data-reveal>
+                <span class="about-eyebrow">OUR BACKGROUND</span>
+                <h2 id="about-story-title">A place to live<br>should feel like <em>home.</em></h2>
             </div>
-        </div>
-    </section>
+            <div class="about-story-copy" data-reveal>
+                <p>Based in Vanderbijlpark, Gauteng, VUT MainRes Maintenance supports the people and places that make residence life possible. Our team brings more than 20 years of experience across plumbing, electrical work, building repairs, and urgent maintenance.</p>
+                <p>From the first report to the final repair, we make it easier for students to get help and get back to what matters.</p>
+                <a class="about-inline-link" href="https://vut.ac.za/" target="_blank" rel="noopener">Discover VUT <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+            </div>
+        </section>
+
+        <section class="about-principles" aria-label="Our vision and mission">
+            <article class="about-principle" data-reveal>
+                <span class="about-principle-number">01 / VISION</span>
+                <i class="fas fa-eye" aria-hidden="true"></i>
+                <h3>Room to thrive.</h3>
+                <p>A safe, comfortable, worry-free home for every VUT student.</p>
+            </article>
+            <article class="about-principle" data-reveal>
+                <span class="about-principle-number">02 / MISSION</span>
+                <i class="fas fa-bullseye" aria-hidden="true"></i>
+                <h3>Care that follows through.</h3>
+                <p>We fix residence issues promptly and properly, so students can focus on studying.</p>
+            </article>
+            <article class="about-principle about-principle-note" data-reveal>
+                <span class="about-principle-number">THE WAY WE WORK</span>
+                <p>Clear communication.<br>Skilled hands.<br>Respect for your space.</p>
+                <a href="student/report-issue.php" aria-label="Report a maintenance issue"><i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </article>
+        </section>
+
+        <section class="about-services" id="about-services" aria-labelledby="about-services-title">
+            <div class="about-services-heading" data-reveal>
+                <div><span class="about-eyebrow">PRACTICAL HELP, RIGHT AT HOME</span><h2 id="about-services-title">What we take care of.</h2></div>
+                <a class="about-inline-link" href="student/report-issue.php">Request a repair <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="about-service-list">
+                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>01</span><i class="fas fa-faucet" aria-hidden="true"></i><strong>Plumbing &amp; leaks</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>02</span><i class="fas fa-bolt" aria-hidden="true"></i><strong>Electrical &amp; plugs</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>03</span><i class="fas fa-lightbulb" aria-hidden="true"></i><strong>Lighting</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>04</span><i class="fas fa-door-open" aria-hidden="true"></i><strong>Doors &amp; windows</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>05</span><i class="fas fa-wifi" aria-hidden="true"></i><strong>WiFi problems</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>06</span><i class="fas fa-fire-burner" aria-hidden="true"></i><strong>Stoves &amp; appliances</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>07</span><i class="fas fa-wind" aria-hidden="true"></i><strong>Heating &amp; cooling</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>08</span><i class="fas fa-bed" aria-hidden="true"></i><strong>Furniture &amp; fittings</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>09</span><i class="fas fa-paint-roller" aria-hidden="true"></i><strong>Painting &amp; repairs</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+            </div>
+            <div class="about-response-row" data-reveal>
+                <div class="about-response-mark"><i class="fas fa-headset" aria-hidden="true"></i></div>
+                <div><span>WHEN SOMETHING NEEDS ATTENTION</span><h3>We’re here to help, day or night.</h3></div>
+                <p>For urgent maintenance or everyday repairs, tell us what’s wrong and our team will take it from there.</p>
+                <a class="about-button about-button-dark" href="student/report-issue.php">Get support <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+        </section>
+    </main>
     <?php endif; ?>
 
     <!-- Footer Area -->
@@ -213,5 +204,8 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
             </div>
         </div>
     </footer>
+    <?php if ($page == 'about'): ?>
+    <script src="assets/js/about.js?v=<?php echo filemtime(__DIR__ . '/assets/js/about.js'); ?>" defer></script>
+    <?php endif; ?>
 </body>
 </html>
