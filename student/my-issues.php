@@ -58,6 +58,8 @@ usort($my_issues, function($a, $b) {
             <li><a href="../index.php">Home</a></li>
             <li><a href="../index.php?page=about">About</a></li>
             <li><a href="report-issue.php">Report</a></li>
+            <li><a href="my-issues.php" class="nav-btn-text">My Issues</a></li>
+            <li><a href="profile.php" class="nav-btn-text">Profile</a></li>
             <li><a href="../index.php" class="nav-btn-primary">Log Out</a></li>
         </ul>
     </nav>
@@ -66,54 +68,10 @@ usort($my_issues, function($a, $b) {
         <h2 class="section-title">My Issues</h2>
         <p class="section-subtitle">View and track your reported maintenance issues.</p>
         
-        <?php if (empty($my_issues)): ?>
-            <div class="about-hero-banner" style="margin-bottom: 2rem;">
-                <h1>No Issues Reported</h1>
-                <p>You haven't reported any maintenance issues yet. <a href="report-issue.php" style="color: var(--accent-color);">Report your first issue now.</a></p>
-            </div>
-        <?php else: ?>
-            <div class="table-container">
-                <table class="services-table">
-                    <thead>
-                        <tr>
-                            <th>Issue ID</th>
-                            <th>Issue Type</th>
-                            <th>Residence</th>
-                            <th>Block</th>
-                            <th>Room</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($my_issues as $issue): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars(substr($issue['id'], -8)); ?></td>
-                            <td><?php echo htmlspecialchars($issue['issue']); ?></td>
-                            <td><?php echo htmlspecialchars($issue['residence']); ?></td>
-                            <td><?php echo htmlspecialchars($issue['block']); ?></td>
-                            <td><?php echo htmlspecialchars($issue['room']); ?></td>
-                            <td>
-                                <span style="padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; 
-                                    <?php
-                                    $status_colors = [
-                                        STATUS_PENDING => 'background: #f59e0b; color: white;',
-                                        STATUS_ASSIGNED => 'background: #3b82f6; color: white;',
-                                        STATUS_IN_PROGRESS => 'background: #8b5cf6; color: white;',
-                                        STATUS_COMPLETED => 'background: #22c55e; color: white;'
-                                    ];
-                                    echo $status_colors[$issue['status']] ?? 'background: #6b7280; color: white;';
-                                    ?>">
-                                    <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $issue['status']))); ?>
-                                </span>
-                            </td>
-                            <td><?php echo date('M d, Y', strtotime($issue['created_at'])); ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
+        <div class="about-hero-banner" style="margin-bottom: 2rem;">
+            <h1>My Reported Issues</h1>
+            <p>This page will display your maintenance request history and status.</p>
+        </div>
     </section>
 
     <footer class="footer">

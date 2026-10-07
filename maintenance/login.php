@@ -1,5 +1,42 @@
 <?php
 require_once '../includes/config.php';
+require_once '../includes/auth.php';
+require_once '../includes/json.php';
+
+$error = '';
+
+// Handle logout
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    logout_user();
+    header('Location: login.php');
+    exit;
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    
+    // Validation
+    if (empty($email) || empty($password)) {
+        $error = 'All fields are required.';
+    } else {
+        // Authenticate staff
+        $user = authenticate_user($email, $password, ROLE_STAFF);
+        
+        if ($user) {
+            // Login successful
+            login_user($user['id'], $user['email'], $user['name'], $user['role']);
+            // Log activity
+            log_activity($user['id'], ROLE_STAFF, 'login', 'Staff logged in: ' . $user['name']);
+            // Redirect to maintenance interface
+            header('Location: index.php');
+            exit;
+        } else {
+            $error = 'Invalid email or password.';
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,12 +93,12 @@ require_once '../includes/config.php';
                     <form class="modern-form" method="POST" action="">
                         <div class="form-group">
                             <label>Email address</label>
-                            <input type="email" placeholder="Enter your email" required>
+                            <input type="email" name="email" placeholder="Enter your email" required>
                         </div>
                         
                         <div class="form-group">
                             <label>Password</label>
-                            <input type="password" placeholder="Enter your password" required>
+                            <input type="password" name="password" placeholder="Enter your password" required>
                         </div>
                         
                         <button type="submit" class="auth-submit-btn">Log In</button>
