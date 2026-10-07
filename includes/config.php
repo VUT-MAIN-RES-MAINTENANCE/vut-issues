@@ -7,6 +7,21 @@
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
+    // Configure session to persist for 30 days
+    session_set_cookie_params([
+        'lifetime' => 30 * 24 * 60 * 60, // 30 days in seconds
+        'path' => '/',
+        'domain' => '',
+        'secure' => false, // Set to true if using HTTPS
+        'httponly' => true,
+        'samesite' => 'Lax' // Changed from Strict to Lax for better navigation
+    ]);
+    
+    // Configure session garbage collection
+    ini_set('session.gc_maxlifetime', 30 * 24 * 60 * 60);
+    ini_set('session.gc_probability', 1);
+    ini_set('session.gc_divisor', 100);
+    
     session_start();
 }
 

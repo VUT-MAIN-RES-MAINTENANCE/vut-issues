@@ -3,8 +3,9 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
-// Require login
-require_login('login.php');
+// Require login and check role
+require_login('../admin/login.php');
+require_role(ROLE_ADMIN, '../index.php');
 
 $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_ADMIN);
@@ -33,13 +34,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         
         if (json_update(MAINTENANCE_REQUESTS_FILE, $issue_id, $updates)) {
             $success = 'Issue assigned successfully!';
-            // Log activity
             log_activity($user_id, ROLE_ADMIN, 'assign_issue', "Assigned issue $issue_id to staff $staff_id", $issue_id);
         } else {
             $error = 'Failed to assign issue. Please try again.';
         }
     }
 }
+
+// Handle status update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_status') {
+    $issue_id = $_POST['issue_id'] ?? '';
+    $status = $_POST['status'] ?? '';
+    
+    if (empty($issue_id) || empty($status)) {
+        $error = 'Issue ID and Status are required.';
+    } else {
+        $updates = [
+            'status' => htmlspecialchars($status),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        
+        if (json_update(MAINTENANCE_REQUESTS_FILE, $issue_id, $updates)) {
+            $success = 'Issue status updated successfully!';
+            log_activity($user_id, ROLE_ADMIN, 'update_status', "Updated issue $issue_id status to $status", $issue_id);
+        } else {
+            $error = 'Failed to update status. Please try again.';
+        }
+    }
+}
+
+// Get filter from URL
+$filter = $_GET['filter'] ?? 'all';
 
 // Get all issues and staff
 $issues = json_read(MAINTENANCE_REQUESTS_FILE);
@@ -50,82 +75,288 @@ usort($issues, function($a, $b) {
     return strtotime($b['created_at'] ?? 0) - strtotime($a['created_at'] ?? 0);
 });
 
+// Filter issues if needed
+if ($filter !== 'all') {
+    $issues = array_filter($issues, function($issue) use ($filter) {
+        return ($issue['status'] ?? 'pending') === $filter;
+    });
+}
+
 // Create staff lookup array
 $staff_lookup = [];
 foreach ($staff as $s) {
     $staff_lookup[$s['id']] = $s['name'];
 }
+
+// Get counts
+$total_issues = count(json_read(MAINTENANCE_REQUESTS_FILE));
+$pending_count = count(array_filter(json_read(MAINTENANCE_REQUESTS_FILE), fn($i) => ($i['status'] ?? 'pending') === 'pending'));
+$in_progress_count = count(array_filter(json_read(MAINTENANCE_REQUESTS_FILE), fn($i) => ($i['status'] ?? 'pending') === 'in_progress'));
+$completed_count = count(array_filter(json_read(MAINTENANCE_REQUESTS_FILE), fn($i) => ($i['status'] ?? 'pending') === 'completed'));
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Manage Issues - Admin - MainRes Maintenance">
-    <meta name="keywords" content="VUT, Admin, Issues">
-    <title>Issues - MainRes Maintenance</title>
+    <title>Issues Management - Admin Dashboard</title>
     <link rel="icon" type="image/png" href="../assets/images/logo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .admin-dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        .admin-sidebar {
+            background: linear-gradient(135deg, #1e3a5f 0%, #26648E 100%);
+            padding: 2rem 1rem;
+            color: white;
+        }
+        
+        .admin-sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .admin-sidebar-logo img {
+            height: 40px;
+        }
+        
+        .admin-nav {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .admin-nav li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .admin-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.75rem 1rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .admin-nav a:hover, .admin-nav a.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .admin-nav a i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .admin-content {
+            padding: 2rem;
+            background: #f5f7fa;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-header h1 {
+            color: #1e3a5f;
+            font-size: 2rem;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+            text-decoration: none;
+        }
+        
+        .filter-tab:hover, .filter-tab.active {
+            background: #26648E;
+            color: white;
+        }
+        
+        .issues-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .issues-table thead {
+            background: #1e3a5f;
+            color: white;
+        }
+        
+        .issues-table th, .issues-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .issues-table tbody tr:hover {
+            background: #f9fafb;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-assigned { background: #dbeafe; color: #1e40af; }
+        .status-in_progress { background: #e0e7ff; color: #3730a3; }
+        .status-completed { background: #d1fae5; color: #065f46; }
+        
+        .action-btn {
+            padding: 0.375rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+        
+        .action-btn-primary {
+            background: #26648E;
+            color: white;
+        }
+        
+        .action-btn-primary:hover {
+            background: #1e3a5f;
+        }
+        
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-item .count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+        
+        .stat-item .label {
+            font-size: 0.875rem;
+            color: #666;
+        }
+    </style>
 </head>
-<body class="home-page">
-    <nav class="navbar">
-        <input type="checkbox" id="nav-toggle" class="nav-toggle-input">
-        <div class="logo">
-            <img src="../assets/images/logo.png" alt="VUT Logo" class="nav-logo">
-            VUT MainRes<span>Maintenance</span>
-        </div>
-        <label for="nav-toggle" class="menu-toggle-btn">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </label>
-        <ul class="nav-links" id="nav-links">
-            <li><a href="../index.php">Home</a></li>
-            <li><a href="students.php" class="nav-btn-text">Students</a></li>
-            <li><a href="maintenance-staff.php" class="nav-btn-text">Maintenance Staff</a></li>
-            <li><a href="issues.php" class="nav-btn-text">Issues</a></li>
-            <li><a href="activities.php" class="nav-btn-text">Activities</a></li>
-            <li><a href="settings.php" class="nav-btn-text">Settings</a></li>
-            <li><a href="login.php?action=logout" class="nav-btn-primary">Log Out</a></li>
-        </ul>
-    </nav>
-
-    <section class="page-container">
-        <h2 class="section-title">Manage Issues</h2>
-        <p class="section-subtitle">View and manage all maintenance requests.</p>
-        
-        <?php if ($error): ?>
-            <div class="error-message" style="color: #ef4444; margin-bottom: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">
-                <?php echo htmlspecialchars($error); ?>
+<body>
+    <div class="admin-dashboard">
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-logo">
+                <img src="../assets/images/logo.png" alt="VUT Logo">
+                <div>
+                    <div style="font-weight: 800;">VUT MainRes</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">Admin Panel</div>
+                </div>
             </div>
-        <?php endif; ?>
+            <ul class="admin-nav">
+                <li><a href="index.php"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="students.php"><i class="fas fa-user-graduate"></i> Students</a></li>
+                <li><a href="maintenance-staff.php"><i class="fas fa-tools"></i> Maintenance Staff</a></li>
+                <li><a href="issues.php" class="active"><i class="fas fa-clipboard-list"></i> Issues</a></li>
+                <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                <li style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1rem;">
+                    <a href="login.php?action=logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
+            </ul>
+        </aside>
         
-        <?php if ($success): ?>
-            <div class="success-message" style="color: #22c55e; margin-bottom: 1rem; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-radius: 8px;">
-                <?php echo htmlspecialchars($success); ?>
+        <main class="admin-content">
+            <div class="admin-header">
+                <h1>Student Reports</h1>
+                <span>Welcome, <?php echo htmlspecialchars($user['name']); ?></span>
             </div>
-        <?php endif; ?>
-        
-        <?php if (empty($issues)): ?>
-            <div class="about-hero-banner" style="margin-bottom: 2rem;">
-                <h1>No Maintenance Issues</h1>
-                <p>No maintenance issues have been reported yet.</p>
+            
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <div class="count"><?php echo $total_issues; ?></div>
+                    <div class="label">Total Issues</div>
+                </div>
+                <div class="stat-item">
+                    <div class="count"><?php echo $pending_count; ?></div>
+                    <div class="label">Pending</div>
+                </div>
+                <div class="stat-item">
+                    <div class="count"><?php echo $in_progress_count; ?></div>
+                    <div class="label">In Progress</div>
+                </div>
+                <div class="stat-item">
+                    <div class="count"><?php echo $completed_count; ?></div>
+                    <div class="label">Fixed (Completed)</div>
+                </div>
             </div>
-        <?php else: ?>
-            <div class="table-container">
-                <table class="services-table">
+            
+            <div class="filter-tabs">
+                <a href="issues.php?filter=all" class="filter-tab <?php echo $filter === 'all' ? 'active' : ''; ?>">All</a>
+                <a href="issues.php?filter=pending" class="filter-tab <?php echo $filter === 'pending' ? 'active' : ''; ?>">Pending</a>
+                <a href="issues.php?filter=in_progress" class="filter-tab <?php echo $filter === 'in_progress' ? 'active' : ''; ?>">In Progress</a>
+                <a href="issues.php?filter=completed" class="filter-tab <?php echo $filter === 'completed' ? 'active' : ''; ?>">Fixed</a>
+            </div>
+            
+            <?php if ($error): ?>
+                <div style="color: #ef4444; margin-bottom: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($success): ?>
+                <div style="color: #22c55e; margin-bottom: 1rem; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-radius: 8px;">
+                    <?php echo htmlspecialchars($success); ?>
+                </div>
+            <?php endif; ?>
+            
+            <?php if (empty($issues)): ?>
+                <div style="text-align: center; padding: 3rem; background: white; border-radius: 12px;">
+                    <i class="fas fa-clipboard-list" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                    <h3 style="color: #1e3a5f; margin-bottom: 0.5rem;">No Issues Found</h3>
+                    <p style="color: #666;">No maintenance issues match the current filter.</p>
+                </div>
+            <?php else: ?>
+                <table class="issues-table">
                     <thead>
                         <tr>
-                            <th>Issue ID</th>
-                            <th>Issue Type</th>
+                            <th>Issue</th>
                             <th>Student</th>
-                            <th>Residence</th>
-                            <th>Block</th>
-                            <th>Room</th>
+                            <th>Location</th>
                             <th>Status</th>
                             <th>Assigned To</th>
                             <th>Actions</th>
@@ -134,85 +365,62 @@ foreach ($staff as $s) {
                     <tbody>
                         <?php foreach ($issues as $issue): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars(substr($issue['id'], -8)); ?></td>
-                            <td><?php echo htmlspecialchars($issue['issue']); ?></td>
-                            <td><?php echo htmlspecialchars($issue['student_name']); ?></td>
-                            <td><?php echo htmlspecialchars($issue['residence']); ?></td>
-                            <td><?php echo htmlspecialchars($issue['block']); ?></td>
-                            <td><?php echo htmlspecialchars($issue['room']); ?></td>
                             <td>
-                                <span style="padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; 
-                                    <?php
-                                    $status_colors = [
-                                        STATUS_PENDING => 'background: #f59e0b; color: white;',
-                                        STATUS_ASSIGNED => 'background: #3b82f6; color: white;',
-                                        STATUS_IN_PROGRESS => 'background: #8b5cf6; color: white;',
-                                        STATUS_COMPLETED => 'background: #22c55e; color: white;'
-                                    ];
-                                    echo $status_colors[$issue['status']] ?? 'background: #6b7280; color: white;';
-                                    ?>">
-                                    <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $issue['status']))); ?>
+                                <div style="font-weight: 600;"><?php echo htmlspecialchars($issue['issue']); ?></div>
+                                <div style="font-size: 0.85rem; color: #666;"><?php echo date('M d, Y', strtotime($issue['created_at'] ?? 'now')); ?></div>
+                            </td>
+                            <td>
+                                <div><?php echo htmlspecialchars($issue['student_name']); ?></div>
+                                <div style="font-size: 0.85rem; color: #666;"><?php echo htmlspecialchars($issue['email'] ?? ''); ?></div>
+                            </td>
+                            <td>
+                                <div><?php echo htmlspecialchars($issue['residence']); ?></div>
+                                <div style="font-size: 0.85rem; color: #666;">Block <?php echo htmlspecialchars($issue['block']); ?>, Room <?php echo htmlspecialchars($issue['room']); ?></div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-<?php echo htmlspecialchars($issue['status'] ?? 'pending'); ?>">
+                                    <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $issue['status'] ?? 'pending'))); ?>
                                 </span>
                             </td>
-                            <td><?php echo isset($issue['assigned_to']) && isset($staff_lookup[$issue['assigned_to']]) ? htmlspecialchars($staff_lookup[$issue['assigned_to']]) : 'Unassigned'; ?></td>
+                            <td>
+                                <?php if (isset($issue['assigned_to']) && isset($staff_lookup[$issue['assigned_to']])): ?>
+                                    <div><?php echo htmlspecialchars($staff_lookup[$issue['assigned_to']]); ?></div>
+                                <?php else: ?>
+                                    <span style="color: #9ca3af;">Unassigned</span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <?php if (empty($issue['assigned_to']) && !empty($staff)): ?>
                                     <form method="POST" action="" style="display: inline;">
                                         <input type="hidden" name="action" value="assign">
                                         <input type="hidden" name="issue_id" value="<?php echo htmlspecialchars($issue['id']); ?>">
-                                        <select name="staff_id" style="padding: 0.3rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white;">
+                                        <select name="staff_id" style="padding: 0.375rem; border-radius: 6px; border: 1px solid #d1d5db; margin-right: 0.5rem;">
                                             <option value="">Select Staff</option>
                                             <?php foreach ($staff as $s): ?>
                                                 <option value="<?php echo htmlspecialchars($s['id']); ?>"><?php echo htmlspecialchars($s['name']); ?></option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <button type="submit" class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin-left: 0.5rem;">Assign</button>
+                                        <button type="submit" class="action-btn action-btn-primary">Assign</button>
                                     </form>
                                 <?php else: ?>
-                                    <span style="color: var(--text-muted); font-size: 0.85rem;">Assigned</span>
+                                    <form method="POST" action="" style="display: inline;">
+                                        <input type="hidden" name="action" value="update_status">
+                                        <input type="hidden" name="issue_id" value="<?php echo htmlspecialchars($issue['id']); ?>">
+                                        <select name="status" style="padding: 0.375rem; border-radius: 6px; border: 1px solid #d1d5db;">
+                                            <option value="pending" <?php echo ($issue['status'] ?? '') === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                            <option value="in_progress" <?php echo ($issue['status'] ?? '') === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+                                            <option value="completed" <?php echo ($issue['status'] ?? '') === 'completed' ? 'selected' : ''; ?>>Fixed</option>
+                                        </select>
+                                        <button type="submit" class="action-btn action-btn-primary" style="margin-left: 0.5rem;">Update</button>
+                                    </form>
                                 <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-            </div>
-        <?php endif; ?>
-    </section>
-
-    <footer class="footer">
-        <div class="footer-services">
-            <div class="footer-column">
-                <div class="footer-column-title">Our Services</div>
-                <p class="footer-column-text">We offer a wide range of premium maintenance services to keep your property in perfect condition.</p>
-            </div>
-            <div class="footer-column">
-                <div class="footer-column-title">Quick Navigation</div>
-                <a href="../index.php">Home</a>
-            </div>
-            <div class="footer-column">
-                <div class="footer-column-title">Connect with us</div>
-                <div class="social-icons">
-                    <a href="https://www.facebook.com/VUT.ac.za/" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://x.com/VUT_Science" target="_blank" rel="noopener"><i class="fab fa-x-twitter"></i></a>
-                    <a href="https://www.linkedin.com/school/vaal-university-of-technology/" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="https://www.instagram.com/vut_university/" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.tiktok.com/@vut_university" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i></a>
-                    <a href="https://www.youtube.com/user/VUTTV" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
-                </div>
-                <div class="footer-column-title">Official Site</div>
-                <a href="https://vut.ac.za/" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Visit VUT Website</a>
-            </div>
-        </div>
-        <div class="footer-content">
-            <div class="footer-brand">
-                <img src="../assets/images/logo.png" alt="MainRes Logo" class="footer-logo">
-                <p>&copy; 2026 MainRes Maintenance. All rights reserved.</p>
-            </div>
-            <div class="footer-links">
-                <a href="mailto:vut@mainresmaintenance.com" class="footer-link">vut@mainresmaintenance.com</a>
-            </div>
-        </div>
-    </footer>
+            <?php endif; ?>
+        </main>
+    </div>
 </body>
 </html>
