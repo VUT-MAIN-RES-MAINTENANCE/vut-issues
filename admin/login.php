@@ -29,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             login_user($user['id'], $user['email'], $user['name'], $user['role']);
             // Log activity
             log_activity($user['id'], ROLE_ADMIN, 'login', 'Admin logged in: ' . $user['name']);
-            // Redirect to students page
-            header('Location: students.php');
+            // Redirect to admin interface
+            header('Location: index.php');
             exit;
         } else {
             $error = 'Invalid email or password.';

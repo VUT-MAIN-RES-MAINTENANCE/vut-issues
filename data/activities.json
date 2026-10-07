@@ -115,5 +115,68 @@
         "description": "Student logged in: Mavangwa",
         "related_issue": null,
         "timestamp": "2026-10-04 09:08:27"
+    },
+    {
+        "id": "activity_6ac64a94a1416ad04f641",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-07 13:35:16"
+    },
+    {
+        "id": "activity_6ac64ac6e8e863c3c6a23",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-07 13:36:06"
+    },
+    {
+        "id": "activity_6ac64b2dc085cc880da59",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-07 13:37:49"
+    },
+    {
+        "id": "activity_6ac64e29d44b21db426b3",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-07 13:50:33"
+    },
+    {
+        "id": "activity_6ac64ee806243675ff037",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-07 13:53:44"
+    },
+    {
+        "id": "activity_6ac64fa83d8fbf08bdf6e",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-07 13:56:56"
+    },
+    {
+        "id": "activity_6ac64fc171aaf5700b761",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-07 13:57:21"
     }
 ]

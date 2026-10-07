@@ -86,36 +86,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $active_form = 'login';
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
+        $role = $_POST['role'] ?? '';
 
-        if ($email === '' || $password === '') {
-            $error = 'Enter your email address and password.';
+        if ($email === '' || $password === '' || $role === '') {
+            $error = 'Enter your email address, password, and select your role.';
         } else {
-            $user = authenticate_user($email, $password, ROLE_STUDENT);
+            $user = authenticate_user($email, $password, $role);
 
             if ($user) {
                 login_user($user['id'], $user['email'], $user['name'], $user['role']);
-                log_activity($user['id'], ROLE_STUDENT, 'login', 'Student logged in: ' . $user['name']);
-                header('Location: index.php');
+                log_activity($user['id'], $role, 'login', ucfirst($role) . ' logged in: ' . $user['name']);
+                
+                // Redirect based on role
+                switch ($role) {
+                    case ROLE_STUDENT:
+                        header('Location: index.php');
+                        break;
+                    case ROLE_STAFF:
+                        header('Location: ../maintenance/index.php');
+                        break;
+                    case ROLE_ADMIN:
+                        header('Location: ../admin/index.php');
+                        break;
+                }
                 exit;
             }
 
-            $user = authenticate_user($email, $password, ROLE_STAFF);
-            if ($user) {
-                login_user($user['id'], $user['email'], $user['name'], $user['role']);
-                log_activity($user['id'], ROLE_STAFF, 'login', 'Staff logged in: ' . $user['name']);
-                header('Location: ../maintenance/index.php');
-                exit;
-            }
-
-            $user = authenticate_user($email, $password, ROLE_ADMIN);
-            if ($user) {
-                login_user($user['id'], $user['email'], $user['name'], $user['role']);
-                log_activity($user['id'], ROLE_ADMIN, 'login', 'Admin logged in: ' . $user['name']);
-                header('Location: ../admin/index.php');
-                exit;
-            }
-
-            $error = 'Invalid email or password.';
+            $error = 'Invalid email or password for the selected role.';
         }
     }
 }
@@ -187,10 +184,23 @@ $signup_role = $form_data['role'] ?? '';
                             <?php endif; ?>
 
                             <div class="auth-field">
+                                <label for="login-role">I am a...</label>
+                                <div class="auth-input-wrap auth-select-wrap">
+                                    <i class="fa-solid fa-user-tag" aria-hidden="true"></i>
+                                    <select id="login-role" name="role" required data-autofocus>
+                                        <option value="" disabled selected>Select your role</option>
+                                        <option value="student">Student</option>
+                                        <option value="staff">Maintenance Staff</option>
+                                        <option value="admin">Administrator</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="auth-field">
                                 <label for="login-email">Email address</label>
                                 <div class="auth-input-wrap">
                                     <i class="fa-regular fa-envelope" aria-hidden="true"></i>
-                                    <input id="login-email" type="email" name="email" value="<?php echo $login_email; ?>" placeholder="you@example.com" autocomplete="email" required data-autofocus>
+                                    <input id="login-email" type="email" name="email" value="<?php echo $login_email; ?>" placeholder="you@example.com" autocomplete="email" required>
                                 </div>
                             </div>
 
