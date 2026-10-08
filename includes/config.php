@@ -14,7 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
         'domain' => '',
         'secure' => false, // Set to true if using HTTPS
         'httponly' => true,
-        'samesite' => 'Lax' // Changed from Strict to Lax for better navigation
+        'samesite' => '' // Empty for maximum compatibility across directories
     ]);
     
     // Configure session garbage collection
@@ -23,6 +23,15 @@ if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.gc_divisor', 100);
     
     session_start();
+    
+    // Regenerate session ID periodically to prevent session fixation
+    if (!isset($_SESSION['created'])) {
+        $_SESSION['created'] = time();
+    } else if (time() - $_SESSION['created'] > 1800) {
+        // Session started more than 30 minutes ago
+        session_regenerate_id(true);
+        $_SESSION['created'] = time();
+    }
 }
 
 // Define base paths

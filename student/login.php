@@ -155,7 +155,6 @@ $signup_role = $form_data['role'] ?? '';
         <ul class="nav-links" id="nav-links">
             <li><a href="../index.php" id="nav-home">Home</a></li>
             <li><a href="../index.php?page=about" class="nav-btn-text" id="nav-about">About</a></li>
-            <li><a href="report-issue.php" class="nav-btn-text" id="nav-report">Report</a></li>
             <li><a href="login.php" class="nav-btn-text" id="nav-login">Log In</a></li>
             <li><a href="login.php?mode=signup" class="nav-btn-primary" id="nav-signup" data-auth-switch="signup">Sign Up</a></li>
         </ul>
@@ -183,16 +182,29 @@ $signup_role = $form_data['role'] ?? '';
                                 <div class="auth-message auth-message-error" role="alert"><?php echo htmlspecialchars($error); ?></div>
                             <?php endif; ?>
 
-                            <div class="auth-field">
-                                <label for="login-role">I am a...</label>
-                                <div class="auth-input-wrap auth-select-wrap">
-                                    <i class="fa-solid fa-user-tag" aria-hidden="true"></i>
-                                    <select id="login-role" name="role" required data-autofocus>
-                                        <option value="" disabled selected>Select your role</option>
-                                        <option value="student">Student</option>
-                                        <option value="staff">Maintenance Staff</option>
-                                        <option value="admin">Administrator</option>
-                                    </select>
+                            <div class="auth-field auth-field--wide">
+                                <label>I am a...</label>
+                                <input type="hidden" id="login-role" name="role" required>
+                                <div class="role-select-wrap">
+                                    <div class="role-select-display" id="loginRoleDisplay" data-empty="true">
+                                        <span class="role-select-icon role-select-icon--placeholder"><i class="fa-solid fa-user-tag"></i></span>
+                                        <span class="role-select-label">Select your role</span>
+                                        <i class="fa-solid fa-chevron-down role-select-caret"></i>
+                                    </div>
+                                    <div class="role-select-dropdown" id="loginRoleDropdown" role="listbox" aria-hidden="true">
+                                        <button type="button" class="role-select-option" data-role="student" role="option">
+                                            <span class="role-option-icon role-option-icon--student"><i class="fa-solid fa-user"></i></span>
+                                            <span class="role-option-title">Student</span>
+                                        </button>
+                                        <button type="button" class="role-select-option" data-role="staff" role="option">
+                                            <span class="role-option-icon role-option-icon--staff"><i class="fa-solid fa-user"></i></span>
+                                            <span class="role-option-title">Maintenance Staff</span>
+                                        </button>
+                                        <button type="button" class="role-select-option" data-role="admin" role="option">
+                                            <span class="role-option-icon role-option-icon--admin"><i class="fa-solid fa-user"></i></span>
+                                            <span class="role-option-title">Administrator</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -233,15 +245,30 @@ $signup_role = $form_data['role'] ?? '';
                             <?php endif; ?>
 
                             <div class="auth-field auth-field--wide">
-                                <label for="signup-role">Account type</label>
-                                <div class="auth-input-wrap auth-select-wrap">
-                                    <i class="fa-solid fa-user-tag" aria-hidden="true"></i>
-                                    <select id="signup-role" name="role" required data-autofocus>
-                                        <option value="" disabled <?php echo $signup_role === '' ? 'selected' : ''; ?>>Select your role</option>
-                                        <option value="student" <?php echo $signup_role === ROLE_STUDENT ? 'selected' : ''; ?>>Student</option>
-                                        <option value="staff" <?php echo $signup_role === ROLE_STAFF ? 'selected' : ''; ?>>Maintenance staff</option>
-                                        <option value="admin" <?php echo $signup_role === ROLE_ADMIN ? 'selected' : ''; ?>>Administrator</option>
-                                    </select>
+                                <label>Account type</label>
+                                <input type="hidden" id="signup-role" name="role" required value="<?php echo htmlspecialchars($signup_role ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                                <div class="role-select-wrap">
+                                    <div class="role-select-display" id="signupRoleDisplay" data-empty="<?php echo empty($signup_role) ? 'true' : 'false'; ?>">
+                                        <span class="role-select-icon <?php echo empty($signup_role) ? 'role-select-icon--placeholder' : ('role-select-icon--' . htmlspecialchars($signup_role)); ?>">
+                                            <i class="fa-solid <?php echo empty($signup_role) ? 'fa-user-tag' : 'fa-user'; ?>"></i>
+                                        </span>
+                                        <span class="role-select-label"><?php echo empty($signup_role) ? 'Select your role' : htmlspecialchars($signup_role === 'staff' ? 'Maintenance Staff' : ($signup_role === 'admin' ? 'Administrator' : 'Student')); ?></span>
+                                        <i class="fa-solid fa-chevron-down role-select-caret"></i>
+                                    </div>
+                                    <div class="role-select-dropdown" id="signupRoleDropdown" role="listbox" aria-hidden="true">
+                                        <button type="button" class="role-select-option" data-role="student" role="option">
+                                            <span class="role-option-icon role-option-icon--student"><i class="fa-solid fa-user"></i></span>
+                                            <span class="role-option-title">Student</span>
+                                        </button>
+                                        <button type="button" class="role-select-option" data-role="staff" role="option">
+                                            <span class="role-option-icon role-option-icon--staff"><i class="fa-solid fa-user"></i></span>
+                                            <span class="role-option-title">Maintenance Staff</span>
+                                        </button>
+                                        <button type="button" class="role-select-option" data-role="admin" role="option">
+                                            <span class="role-option-icon role-option-icon--admin"><i class="fa-solid fa-user"></i></span>
+                                            <span class="role-option-title">Administrator</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -374,6 +401,118 @@ $signup_role = $form_data['role'] ?? '';
             validatePasswordMatch();
             if (!signupForm.reportValidity()) event.preventDefault();
         });
+
+        function setRoleSelection(pickerName, role, silentUpdate = false) {
+            const display = document.getElementById(pickerName === 'login' ? 'loginRoleDisplay' : 'signupRoleDisplay');
+            const dropdown = document.getElementById(pickerName === 'login' ? 'loginRoleDropdown' : 'signupRoleDropdown');
+            const hidden = document.getElementById(pickerName === 'login' ? 'login-role' : 'signup-role');
+            if (!display || !dropdown || !hidden) return;
+
+            const meta = {
+                student: { label: 'Student' },
+                staff:   { label: 'Maintenance Staff' },
+                admin:   { label: 'Administrator' }
+            };
+
+            hidden.value = role || '';
+
+            const iconEl = display.querySelector('.role-select-icon');
+            const labelEl = display.querySelector('.role-select-label');
+
+            iconEl.classList.remove(
+                'role-select-icon--placeholder',
+                'role-select-icon--student',
+                'role-select-icon--staff',
+                'role-select-icon--admin'
+            );
+            const iconInner = iconEl.querySelector('i');
+            if (iconInner) iconInner.remove();
+
+            if (role && meta[role]) {
+                display.dataset.empty = 'false';
+                iconEl.classList.add('role-select-icon--' + role);
+                iconEl.innerHTML = `<i class="fa-solid fa-user"></i>`;
+                labelEl.textContent = meta[role].label;
+                dropdown.querySelectorAll('.role-select-option').forEach(opt => {
+                    const selected = opt.dataset.role === role;
+                    opt.classList.toggle('role-option--selected', selected);
+                    opt.setAttribute('aria-selected', selected ? 'true' : 'false');
+                });
+            } else {
+                display.dataset.empty = 'true';
+                iconEl.classList.add('role-select-icon--placeholder');
+                iconEl.innerHTML = `<i class="fa-solid fa-user-tag"></i>`;
+                labelEl.textContent = 'Select your role';
+            }
+
+            if (!silentUpdate) updateAuthFormHeight();
+        }
+
+        function closeAllRoleDropdowns(except) {
+            document.querySelectorAll('.role-select-dropdown').forEach(dd => {
+                if (except && dd === except) return;
+                dd.classList.remove('role-select-dropdown--open');
+                dd.setAttribute('aria-hidden', 'true');
+                const display = document.getElementById(dd.id.replace('Dropdown', 'Display'));
+                if (display) display.classList.remove('role-select-display--open');
+            });
+        }
+
+        document.querySelectorAll('.role-select-display').forEach(display => {
+            display.addEventListener('click', event => {
+                event.stopPropagation();
+                const name = display.id.includes('login') ? 'login' : 'signup';
+                const dropdown = document.getElementById(name === 'login' ? 'loginRoleDropdown' : 'signupRoleDropdown');
+                const isOpen = dropdown.classList.toggle('role-select-dropdown--open');
+                dropdown.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+                display.classList.toggle('role-select-display--open', isOpen);
+                closeAllRoleDropdowns(isOpen ? dropdown : null);
+                updateAuthFormHeight();
+            });
+        });
+
+        document.querySelectorAll('.role-select-option').forEach(opt => {
+            opt.addEventListener('click', event => {
+                event.stopPropagation();
+                const dropdown = opt.closest('.role-select-dropdown');
+                const name = dropdown.id.includes('login') ? 'login' : 'signup';
+                setRoleSelection(name, opt.dataset.role);
+                closeAllRoleDropdowns(null);
+            });
+        });
+
+        document.addEventListener('click', () => closeAllRoleDropdowns(null));
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeAllRoleDropdowns(null);
+        });
+
+        (function initRolePickers() {
+            const loginRole = document.getElementById('login-role');
+            if (loginRole && loginRole.value) setRoleSelection('login', loginRole.value, true);
+            const signupRole = document.getElementById('signup-role');
+            if (signupRole && signupRole.value) setRoleSelection('signup', signupRole.value, true);
+        })();
+
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', event => {
+                const hidden = document.getElementById('login-role');
+                if (!hidden || !hidden.value) {
+                    event.preventDefault();
+                    alert('Please select your role to continue.');
+                }
+            });
+        }
+        if (signupForm) {
+            signupForm.addEventListener('submit', event => {
+                const hidden = document.getElementById('signup-role');
+                if (!hidden || !hidden.value) {
+                    event.preventDefault();
+                    alert('Please select an account type to continue.');
+                }
+            });
+        }
     </script>
 </body>
 </html>
