@@ -3,8 +3,8 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
-// Require login
 require_login('login.php');
+require_role(ROLE_ADMIN, 'login.php');
 
 $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_ADMIN);
@@ -17,25 +17,21 @@ if (!$user) {
 $error = '';
 $success = '';
 
-// Handle staff deletion
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $staff_id = $_GET['id'];
     if (json_delete(STAFF_FILE, $staff_id)) {
-        // Log activity
         log_activity($user_id, ROLE_ADMIN, 'delete_staff', "Deleted staff: $staff_id", $staff_id);
         header('Location: maintenance-staff.php');
         exit;
     }
 }
 
-// Handle staff addition
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
     $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $phone = trim($_POST['phone'] ?? '');
-    
-    // Validation
+
     if (empty($name) || empty($email) || empty($password)) {
         $error = 'Name, email, and password are required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -43,14 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } elseif (strlen($password) < 6) {
         $error = 'Password must be at least 6 characters.';
     } else {
-        // Check if email already exists
-        $existing = json_find_by_field(STAFF_FILE, 'email', $email);
+        $existing = json_find(STAFF_FILE, 'email', $email);
         if ($existing) {
             $error = 'Email already registered.';
         } else {
-            // Add staff member
             $new_staff = [
-                'id' => json_generate_id(),
+                'id' => generate_id('staff_'),
                 'name' => htmlspecialchars($name),
                 'email' => htmlspecialchars($email),
                 'password' => password_hash($password, PASSWORD_DEFAULT),
@@ -58,10 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'role' => ROLE_STAFF,
                 'created_at' => date('Y-m-d H:i:s')
             ];
-            
+
             if (json_add(STAFF_FILE, $new_staff)) {
                 $success = 'Staff member added successfully!';
-                // Log activity
                 log_activity($user_id, ROLE_ADMIN, 'add_staff', "Added staff: $email");
             } else {
                 $error = 'Failed to add staff member. Please try again.';
@@ -70,162 +63,230 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Get all staff
 $staff = json_read(STAFF_FILE);
 
-// Sort by created date (newest first)
 usort($staff, function($a, $b) {
     return strtotime($b['created_at'] ?? 0) - strtotime($a['created_at'] ?? 0);
 });
+
+$issues = json_read(MAINTENANCE_REQUESTS_FILE);
+$staff_load = [];
+foreach ($staff as $s) {
+    $sid = $s['id'];
+    $assigned = array_filter($issues, fn($i) => ($i['assigned_to'] ?? '') === $sid);
+    $completed = array_filter($assigned, fn($i) => ($i['status'] ?? '') === 'completed');
+    $staff_load[$sid] = ['total' => count($assigned), 'done' => count($completed)];
+}
+
+$display_date = date('d/m/Y');
+$display_name = !empty($user['name']) ? $user['name'] : 'System Administrator';
+$display_email = $user['email'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Manage Maintenance Staff - Admin - MainRes Maintenance">
-    <meta name="keywords" content="VUT, Admin, Maintenance Staff">
-    <title>Maintenance Staff - MainRes Maintenance</title>
+    <title>Maintenance Staff - Admin Dashboard</title>
     <link rel="icon" type="image/png" href="../assets/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
-<body class="home-page">
-    <nav class="navbar">
-        <input type="checkbox" id="nav-toggle" class="nav-toggle-input">
-        <div class="logo">
-            <img src="../assets/images/logo.png" alt="VUT Logo" class="nav-logo">
-            VUT MainRes<span>Maintenance</span>
-        </div>
-        <label for="nav-toggle" class="menu-toggle-btn">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </label>
-        <ul class="nav-links" id="nav-links">
-            <li><a href="../index.php">Home</a></li>
-            <li><a href="students.php" class="nav-btn-text">Students</a></li>
-            <li><a href="maintenance-staff.php" class="nav-btn-text">Maintenance Staff</a></li>
-            <li><a href="issues.php" class="nav-btn-text">Issues</a></li>
-            <li><a href="activities.php" class="nav-btn-text">Activities</a></li>
-            <li><a href="settings.php" class="nav-btn-text">Settings</a></li>
-            <li><a href="login.php?action=logout" class="nav-btn-primary">Log Out</a></li>
-        </ul>
-    </nav>
+<body>
+    <div class="admin-dashboard" style="padding-top: 0;">
+        <aside class="admin-sidebar" style="top: 0; height: 100vh;">
+            <div class="admin-sidebar-logo">
+                <img src="../assets/images/logo.png" alt="VUT Logo">
+                <div>
+                    <div>VUT MainRes</div>
+                    <div>Admin Panel</div>
+                </div>
+            </div>
+            <ul class="admin-nav">
+                <li><a href="../index.php"><i class="fas fa-globe"></i> Website</a></li>
+                <li><a href="index.php"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="students.php"><i class="fas fa-user-graduate"></i> Students</a></li>
+                <li><a href="maintenance-staff.php" class="active"><i class="fas fa-tools"></i> Maintenance Staff</a></li>
+                <li><a href="issues.php"><i class="fas fa-clipboard-list"></i> Issues</a></li>
+                <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                <li>
+                    <a href="login.php?action=logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
+            </ul>
+        </aside>
 
-    <section class="page-container">
-        <h2 class="section-title">Manage Maintenance Staff</h2>
-        <p class="section-subtitle">View and manage maintenance staff accounts.</p>
-        
-        <?php if ($error): ?>
-            <div class="error-message" style="color: #ef4444; margin-bottom: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">
-                <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
-        
-        <?php if ($success): ?>
-            <div class="success-message" style="color: #22c55e; margin-bottom: 1rem; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-radius: 8px;">
-                <?php echo htmlspecialchars($success); ?>
-            </div>
-        <?php endif; ?>
-        
-        <div class="form-container" style="margin-bottom: 2rem;">
-            <h3 style="margin-bottom: 1rem;">Add New Staff Member</h3>
-            <form class="modern-form" method="POST" action="">
-                <input type="hidden" name="action" value="add">
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" name="name" required>
+        <main class="admin-content">
+            <div class="admin-header">
+                <h1>Maintenance Staff</h1>
+                <div class="admin-header-info">
+                    <div class="admin-header-date" title="Today's date">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span><?php echo htmlspecialchars($display_date); ?></span>
                     </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" name="password" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label>Phone</label>
-                        <input type="tel" name="phone">
+                    <div class="admin-header-user">
+                        <div class="admin-header-avatar" title="<?php echo htmlspecialchars($display_name); ?>">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="admin-header-user-details">
+                            <div class="admin-header-user-name"><?php echo htmlspecialchars($display_name); ?></div>
+                            <?php if (!empty($display_email)): ?>
+                                <div class="admin-header-user-email"><?php echo htmlspecialchars($display_email); ?></div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Staff Member</button>
-            </form>
-        </div>
-        
-        <?php if (empty($staff)): ?>
-            <div class="about-hero-banner" style="margin-bottom: 2rem;">
-                <h1>No Maintenance Staff</h1>
-                <p>No maintenance staff have been added yet.</p>
             </div>
-        <?php else: ?>
-            <div class="table-container">
-                <table class="services-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Added</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($staff as $member): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($member['name']); ?></td>
-                            <td><?php echo htmlspecialchars($member['email']); ?></td>
-                            <td><?php echo htmlspecialchars($member['phone'] ?? 'N/A'); ?></td>
-                            <td><?php echo date('M d, Y', strtotime($member['created_at'] ?? 'now')); ?></td>
-                            <td>
-                                <a href="maintenance-staff.php?action=delete&id=<?php echo htmlspecialchars($member['id']); ?>" onclick="return confirm('Are you sure you want to delete this staff member?');" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #ef4444;">Delete</a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
-    </section>
 
-    <footer class="footer">
-        <div class="footer-services">
-            <div class="footer-column">
-                <div class="footer-column-title">Our Services</div>
-                <p class="footer-column-text">We offer a wide range of premium maintenance services to keep your property in perfect condition.</p>
+            <?php if ($error): ?>
+                <div class="alert-error"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <?php if ($success): ?>
+                <div class="alert-success"><?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
+
+            <div class="form-container" style="margin-bottom: 1.75rem;">
+                <h3 style="display: flex; align-items: center; gap: 0.65rem;">
+                    <i class="fas fa-user-plus" style="color: var(--admin-accent-cyan);"></i>
+                    Add New Staff Member
+                </h3>
+                <form method="POST" action="">
+                    <input type="hidden" name="action" value="add">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label><i class="fas fa-user" style="margin-right: 6px; color: var(--admin-text-dim); font-size: 0.8rem;"></i>Full Name</label>
+                            <input type="text" name="name" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope" style="margin-right: 6px; color: var(--admin-text-dim); font-size: 0.8rem;"></i>Email</label>
+                            <input type="email" name="email" placeholder="staff@vut.ac.za" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock" style="margin-right: 6px; color: var(--admin-text-dim); font-size: 0.8rem;"></i>Password</label>
+                            <input type="password" name="password" placeholder="Min. 6 characters" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone" style="margin-right: 6px; color: var(--admin-text-dim); font-size: 0.8rem;"></i>Phone (optional)</label>
+                            <input type="tel" name="phone" placeholder="+27 00 000 0000">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+                        <i class="fas fa-plus"></i>
+                        Add Staff Member
+                    </button>
+                </form>
             </div>
-            <div class="footer-column">
-                <div class="footer-column-title">Quick Navigation</div>
-                <a href="../index.php">Home</a>
-            </div>
-            <div class="footer-column">
-                <div class="footer-column-title">Connect with us</div>
-                <div class="social-icons">
-                    <a href="https://www.facebook.com/VUT.ac.za/" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://x.com/VUT_Science" target="_blank" rel="noopener"><i class="fab fa-x-twitter"></i></a>
-                    <a href="https://www.linkedin.com/school/vaal-university-of-technology/" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="https://www.instagram.com/vut_university/" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.tiktok.com/@vut_university" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i></a>
-                    <a href="https://www.youtube.com/user/VUTTV" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
+
+            <?php if (empty($staff)): ?>
+                <div class="empty-state">
+                    <i class="fas fa-tools"></i>
+                    <h3>No Maintenance Staff</h3>
+                    <p>No maintenance staff have been added yet. Use the form above to add team members.</p>
                 </div>
-                <div class="footer-column-title">Official Site</div>
-                <a href="https://vut.ac.za/" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Visit VUT Website</a>
-            </div>
-        </div>
-        <div class="footer-content">
-            <div class="footer-brand">
-                <img src="../assets/images/logo.png" alt="MainRes Logo" class="footer-logo">
-                <p>&copy; 2026 MainRes Maintenance. All rights reserved.</p>
-            </div>
-            <div class="footer-links">
-                <a href="mailto:vut@mainresmaintenance.com" class="footer-link">vut@mainresmaintenance.com</a>
-            </div>
-        </div>
-    </footer>
+            <?php else: ?>
+                <div class="table-container">
+                    <table class="services-table">
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Contact</th>
+                                <th>Assigned</th>
+                                <th>Completed</th>
+                                <th>Performance</th>
+                                <th>Added</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($staff as $member):
+                                $sid = $member['id'];
+                                $load = $staff_load[$sid] ?? ['total' => 0, 'done' => 0];
+                                $rate = $load['total'] > 0 ? round(($load['done'] / $load['total']) * 100) : 0;
+                                $rateColor = $rate >= 75 ? '#22c55e' : ($rate >= 40 ? '#f59e0b' : '#ef4444');
+                            ?>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: #fff; flex-shrink: 0;">
+                                            <?php echo strtoupper(substr($member['name'], 0, 1)); ?>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; color: var(--admin-text-primary);"><?php echo htmlspecialchars($member['name']); ?></div>
+                                            <div style="display: flex; align-items: center; gap: 4px; font-size: 0.72rem; color: var(--admin-accent-green);">
+                                                <i class="fas fa-circle" style="font-size: 0.4rem;"></i>
+                                                Active
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size: 0.85rem; color: var(--admin-accent-cyan);"><?php echo htmlspecialchars($member['email']); ?></div>
+                                    <div style="font-size: 0.78rem; color: var(--admin-text-muted); margin-top: 2px;">
+                                        <i class="fas fa-phone" style="font-size: 0.7rem; margin-right: 3px;"></i>
+                                        <?php echo htmlspecialchars($member['phone'] ?? 'N/A'); ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+                                        <i class="fas fa-clipboard-list" style="font-size: 0.75rem; color: #3b82f6;"></i>
+                                        <?php echo $load['total']; ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--admin-accent-green);">
+                                        <i class="fas fa-check-circle" style="font-size: 0.75rem;"></i>
+                                        <?php echo $load['done']; ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 140px;">
+                                        <div style="flex: 1; height: 6px; background: rgba(100, 116, 139, 0.2); border-radius: 3px; overflow: hidden;">
+                                            <div style="height: 100%; width: <?php echo $rate; ?>%; background: <?php echo $rateColor; ?>; border-radius: 3px;"></div>
+                                        </div>
+                                        <span style="font-size: 0.8rem; font-weight: 700; color: <?php echo $rateColor; ?>;"><?php echo $rate; ?>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 500;"><?php echo date('M d, Y', strtotime($member['created_at'] ?? 'now')); ?></div>
+                                    <div style="font-size: 0.75rem; color: var(--admin-text-muted);"><?php echo date('H:i', strtotime($member['created_at'] ?? 'now')); ?></div>
+                                </td>
+                                <td>
+                                    <a href="maintenance-staff.php?action=delete&id=<?php echo htmlspecialchars($member['id']); ?>"
+                                       onclick="return confirm('Are you sure you want to delete this staff member?');"
+                                       class="btn btn-danger" style="padding: 0.45rem 0.85rem; font-size: 0.825rem;">
+                                        <i class="fas fa-trash" style="margin-right: 4px;"></i> Remove
+                                    </a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </main>
+    </div>
+    <script>
+    (function applyAdminTheme(){
+        const saved = localStorage.getItem('adminTheme');
+        if (saved !== 'light') return;
+        const root = document.documentElement;
+        root.style.setProperty('--admin-bg-primary', '#f5f7fb');
+        root.style.setProperty('--admin-bg-secondary', '#ffffff');
+        root.style.setProperty('--admin-bg-tertiary', '#eef2f7');
+        root.style.setProperty('--admin-sidebar-bg', 'rgba(255, 255, 255, 0.92)');
+        root.style.setProperty('--admin-topbar-bg', 'rgba(255, 255, 255, 0.95)');
+        root.style.setProperty('--admin-glass-bg', 'rgba(255, 255, 255, 0.8)');
+        root.style.setProperty('--admin-glass-border', 'rgba(15, 23, 42, 0.1)');
+        root.style.setProperty('--admin-glass-highlight', 'rgba(15, 23, 42, 0.04)');
+        root.style.setProperty('--admin-text-primary', '#0f172a');
+        root.style.setProperty('--admin-text-secondary', '#334155');
+        root.style.setProperty('--admin-text-muted', '#64748b');
+        root.style.setProperty('--admin-text-dim', '#94a3b8');
+        document.body.classList.add('admin-light-mode');
+    })();
+    </script>
 </body>
 </html>

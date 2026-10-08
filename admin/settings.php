@@ -3,9 +3,8 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
-// Require login and check role
-require_login('../admin/login.php');
-require_role(ROLE_ADMIN, '../index.php');
+require_login('login.php');
+require_role(ROLE_ADMIN, 'login.php');
 
 $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_ADMIN);
@@ -18,33 +17,11 @@ if (!$user) {
 $error = '';
 $success = '';
 
-// Handle applications status toggle
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_applications_status'])) {
-    $applications_open = ($_POST['applications_open'] ?? '') === '1';
-    
-    // Read current settings
-    $settings = json_read(SETTINGS_FILE);
-    if (empty($settings)) {
-        $settings = [];
-    }
-    
-    $settings['applications_open'] = $applications_open;
-    $settings['updated_at'] = date('Y-m-d H:i:s');
-    
-    if (json_write(SETTINGS_FILE, $settings)) {
-        $success = 'Applications are now ' . ($applications_open ? 'OPEN.' : 'CLOSED.');
-        log_activity($user_id, ROLE_ADMIN, 'update_settings', 'Updated applications status to: ' . ($applications_open ? 'OPEN' : 'CLOSED'));
-    } else {
-        $error = 'Unable to save the application status. Please try again.';
-    }
-}
-
-// Handle password change
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     $current_password = $_POST['current_password'] ?? '';
     $new_password = $_POST['new_password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
-    
+
     if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
         $error = 'All password fields are required.';
     } elseif (strlen($new_password) < 8) {
@@ -58,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
             'password' => hash_password($new_password),
             'updated_at' => date('Y-m-d H:i:s')
         ];
-        
+
         if (json_update(ADMINS_FILE, $user['id'], $updates)) {
             $success = 'Password changed successfully!';
             log_activity($user_id, ROLE_ADMIN, 'change_password', 'Admin changed password');
@@ -68,9 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     }
 }
 
-// Get current settings
 $settings = json_read(SETTINGS_FILE);
-$applications_open = $settings['applications_open'] ?? true;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,388 +54,48 @@ $applications_open = $settings['applications_open'] ?? true;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Admin Dashboard</title>
     <link rel="icon" type="image/png" href="../assets/images/logo.png">
-    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        .admin-dashboard {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            min-height: 100vh;
-        }
-        
-        .admin-sidebar {
-            background: linear-gradient(135deg, #1e3a5f 0%, #26648E 100%);
-            padding: 2rem 1rem;
-            color: white;
-        }
-        
-        .admin-sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .admin-sidebar-logo img {
-            height: 40px;
-        }
-        
-        .admin-nav {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .admin-nav li {
-            margin-bottom: 0.5rem;
-        }
-        
-        .admin-nav a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0.75rem 1rem;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        
-        .admin-nav a:hover, .admin-nav a.active {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        
-        .admin-nav a i {
-            width: 20px;
-            text-align: center;
-        }
-        
-        .admin-content {
-            padding: 2rem;
-            background: #f5f7fa;
-        }
-        
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        
-        .admin-header h1 {
-            color: #1e3a5f;
-            font-size: 2rem;
-        }
-        
-        .settings-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .settings-section {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .settings-section:last-child {
-            border-bottom: none;
-        }
-        
-        .settings-section-title {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e3a5f;
-            margin-bottom: 1.5rem;
-        }
-        
-        .settings-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
-        
-        .settings-item-info label {
-            display: block;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 0.25rem;
-        }
-        
-        .settings-item-info p {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin: 0;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 26px;
-        }
-        
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        .toggle-switch input:checked + .toggle-slider {
-            background-color: #26648E;
-        }
-        
-        .toggle-switch input:checked + .toggle-slider:before {
-            transform: translateX(24px);
-        }
-        
-        .form-control {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.875rem;
-        }
-        
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: all 0.3s;
-        }
-        
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #4b5563;
-        }
-        
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-        
-        .btn-primary {
-            background: #26648E;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #1e3a5f;
-        }
-        
-        .applications-status-line {
-            margin-top: 1rem;
-            padding: 0.75rem;
-            border-radius: 6px;
-            font-size: 0.875rem;
-        }
-        
-        .applications-status-line.is-open {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .applications-status-line.is-closed {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .applications-status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 0.5rem;
-        }
-        
-        .is-open .applications-status-dot {
-            background: #22c55e;
-        }
-        
-        .is-closed .applications-status-dot {
-            background: #ef4444;
-        }
-        
-        .modal-wrap {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .modal {
-            background: white;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        
-        .modal-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .modal-head h3 {
-            margin: 0;
-            color: #1e3a5f;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6b7280;
-        }
-        
-        .modal-body {
-            padding: 1.5rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #374151;
-        }
-        
-        .modal-foot {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            padding: 1.5rem;
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            color: white;
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-        }
-        
-        .toast.success {
-            background: #22c55e;
-        }
-        
-        .toast.error {
-            background: #ef4444;
-        }
-        
-        .toast.warning {
-            background: #f59e0b;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
-    <div class="admin-dashboard">
-        <aside class="admin-sidebar">
+    <div class="admin-dashboard" style="padding-top: 0;">
+        <aside class="admin-sidebar" style="top: 0; height: 100vh;">
             <div class="admin-sidebar-logo">
                 <img src="../assets/images/logo.png" alt="VUT Logo">
                 <div>
-                    <div style="font-weight: 800;">VUT MainRes</div>
-                    <div style="font-size: 0.8rem; opacity: 0.8;">Admin Panel</div>
+                    <div>VUT MainRes</div>
+                    <div>Admin Panel</div>
                 </div>
             </div>
             <ul class="admin-nav">
+                <li><a href="../index.php"><i class="fas fa-globe"></i> Website</a></li>
                 <li><a href="index.php"><i class="fas fa-home"></i> Dashboard</a></li>
                 <li><a href="students.php"><i class="fas fa-user-graduate"></i> Students</a></li>
                 <li><a href="maintenance-staff.php"><i class="fas fa-tools"></i> Maintenance Staff</a></li>
                 <li><a href="issues.php"><i class="fas fa-clipboard-list"></i> Issues</a></li>
                 <li><a href="settings.php" class="active"><i class="fas fa-cog"></i> Settings</a></li>
-                <li style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1rem;">
+                <li>
                     <a href="login.php?action=logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </li>
             </ul>
         </aside>
-        
+
         <main class="admin-content">
             <div class="admin-header">
-                <h1>Settings</h1>
-                <span>Welcome, <?php echo htmlspecialchars($user['name']); ?></span>
+                <h1>System Settings</h1>
             </div>
-            
+
             <?php if ($error): ?>
-                <div style="color: #ef4444; margin-bottom: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">
-                    <?php echo htmlspecialchars($error); ?>
-                </div>
+                <div class="alert-error"><i class="fas fa-circle-exclamation" style="margin-right: 8px;"></i><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
-            
+
             <?php if ($success): ?>
-                <div style="color: #22c55e; margin-bottom: 1rem; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-radius: 8px;">
-                    <?php echo htmlspecialchars($success); ?>
-                </div>
+                <div class="alert-success"><i class="fas fa-circle-check" style="margin-right: 8px;"></i><?php echo htmlspecialchars($success); ?></div>
             <?php endif; ?>
-            
+
             <div class="settings-card">
                 <!-- Language Section -->
                 <div class="settings-section">
@@ -469,11 +104,13 @@ $applications_open = $settings['applications_open'] ?? true;
                     </h4>
                     <div class="settings-item">
                         <div class="settings-item-info">
-                            <label class="settings-item-label">Select Language</label>
-                            <p class="settings-item-description">Choose your preferred language</p>
+                            <label>Interface Language</label>
+                            <p>Choose your preferred display language.</p>
                         </div>
-                        <select class="form-control" style="width: 200px;" onchange="changeLanguage(this.value)">
-                            <option value="en" <?php echo (!isset($_COOKIE['lang']) || $_COOKIE['lang'] === 'en') ? 'selected' : ''; ?>>English</option>
+                        <select class="form-control" style="width: 220px;" onchange="changeLanguage(this.value)">
+                            <option value="en" <?php echo (!isset($_COOKIE['lang']) || $_COOKIE['lang'] === 'en') ? 'selected' : ''; ?>>
+                                <i class="fas fa-flag-usa"></i> English
+                            </option>
                             <option value="ts" <?php echo (isset($_COOKIE['lang']) && $_COOKIE['lang'] === 'ts') ? 'selected' : ''; ?>>Xitsonga</option>
                             <option value="zu" <?php echo (isset($_COOKIE['lang']) && $_COOKIE['lang'] === 'zu') ? 'selected' : ''; ?>>isiZulu</option>
                         </select>
@@ -487,35 +124,14 @@ $applications_open = $settings['applications_open'] ?? true;
                     </h4>
                     <div class="settings-item">
                         <div class="settings-item-info">
-                            <label class="settings-item-label">Dark mode</label>
-                            <p class="settings-item-description">Switch between light and dark theme</p>
+                            <label>Light Mode</label>
+                            <p>Toggle between dark (default) and light interface theme.</p>
                         </div>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                </div>
-
-                <!-- Student Registration Section -->
-                <div class="settings-section">
-                    <h4 class="settings-section-title">
-                        <i class="fas fa-clipboard-check"></i> Student Registration / Applications
-                    </h4>
-                    <div class="settings-item">
-                        <div class="settings-item-info">
-                            <label for="applicationsOpen" class="settings-item-label">Allow student registration and applications</label>
-                            <p class="settings-item-description">When closed, students cannot create accounts or submit residence applications.</p>
-                        </div>
-                        <label class="toggle-switch" for="applicationsOpen">
-                            <input type="checkbox" id="applicationsOpen" name="applications_open" value="1" <?php echo $applications_open ? 'checked' : ''; ?> aria-label="Allow student registration and applications" onchange="updateApplicationsStatus()">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <p class="applications-status-line <?php echo $applications_open ? 'is-open' : 'is-closed'; ?>" role="status" id="applicationsStatusLine">
-                        <span class="applications-status-dot" aria-hidden="true"></span>
-                        Applications: <strong id="applicationsStatusText"><?php echo $applications_open ? 'OPEN' : 'CLOSED'; ?></strong>
-                    </p>
                 </div>
 
                 <!-- Account Section -->
@@ -525,10 +141,37 @@ $applications_open = $settings['applications_open'] ?? true;
                     </h4>
                     <div class="settings-item">
                         <div class="settings-item-info">
-                            <label class="settings-item-label">Change password</label>
-                            <p class="settings-item-description">Update your account password</p>
+                            <label>Change Password</label>
+                            <p>Update your admin account password regularly.</p>
                         </div>
-                        <button class="btn btn-secondary" onclick="showPasswordModal()">Change</button>
+                        <button class="btn btn-primary" onclick="showPasswordModal()">
+                            <i class="fas fa-key"></i> Change Password
+                        </button>
+                    </div>
+                    <div class="settings-item" style="border-top: 1px solid var(--admin-glass-border); margin-top: 0.5rem; padding-top: 1.25rem;">
+                        <div class="settings-item-info">
+                            <label>Current Session</label>
+                            <p>
+                                Signed in as <strong style="color: var(--admin-accent-cyan);"><?php echo htmlspecialchars($user['email']); ?></strong>
+                                <br>
+                                <span style="font-size: 0.78rem;">Role: System Administrator</span>
+                            </p>
+                        </div>
+                        <button class="btn btn-danger" onclick="if(confirm('Sign out of admin panel?')) window.location.href='login.php?action=logout';">
+                            <i class="fas fa-right-from-bracket"></i> Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.75rem; padding: 1.25rem 1.5rem; border-radius: var(--admin-radius-lg); background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(212, 175, 55, 0.06) 100%); border: 1px solid rgba(6, 182, 212, 0.15); display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(212, 175, 55, 0.18)); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas fa-circle-info" style="font-size: 1.25rem; color: var(--admin-accent-cyan);"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 700; color: var(--admin-text-primary);">System Status: <span style="color: var(--admin-accent-green);"><i class="fas fa-circle" style="font-size: 0.5rem; margin-right: 4px; animation: pulse 2s infinite;"></i>Operational</span></div>
+                    <div style="font-size: 0.825rem; color: var(--admin-text-muted); margin-top: 2px;">
+                        Settings last updated: <?php echo isset($settings['updated_at']) ? date('M d, Y @ H:i', strtotime($settings['updated_at'])) : 'Never'; ?>
                     </div>
                 </div>
             </div>
@@ -539,76 +182,43 @@ $applications_open = $settings['applications_open'] ?? true;
     <div class="modal-wrap" id="passwordModal" style="display: none;">
         <div class="modal">
             <div class="modal-head">
-                <h3>Change Password</h3>
+                <h3><i class="fas fa-key" style="margin-right: 8px; color: var(--admin-accent-cyan);"></i>Change Admin Password</h3>
                 <button class="modal-close" onclick="hidePasswordModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="passwordForm" method="POST" action="">
                     <input type="hidden" name="change_password" value="1">
                     <div class="form-group">
-                        <label class="form-label">Current Password</label>
-                        <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+                        <label><i class="fas fa-lock" style="margin-right: 6px; color: var(--admin-text-dim); font-size: 0.8rem;"></i>Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" name="current_password" placeholder="Enter your current password" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">New Password</label>
-                        <input type="password" class="form-control" id="newPassword" name="new_password" required minlength="8">
+                        <label><i class="fas fa-key" style="margin-right: 6px; color: var(--admin-text-dim); font-size: 0.8rem;"></i>New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="new_password" placeholder="Min. 8 characters" required minlength="8">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Confirm New Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required minlength="8">
+                        <label><i class="fas fa-check-double" style="margin-right: 6px; color: var(--admin-text-dim); font-size: 0.8rem;"></i>Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password" placeholder="Re-enter new password" required minlength="8">
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--admin-text-muted); display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-shield-halved" style="color: var(--admin-accent-green);"></i>
+                        Passwords are securely hashed before storage.
                     </div>
                 </form>
             </div>
             <div class="modal-foot">
                 <button class="btn btn-secondary" onclick="hidePasswordModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="document.getElementById('passwordForm').submit()">Change Password</button>
+                <button class="btn btn-primary" onclick="validateAndSubmit()">
+                    <i class="fas fa-save"></i> Update Password
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-    // Update applications status display dynamically and save automatically
-    function updateApplicationsStatus() {
-        const checkbox = document.getElementById('applicationsOpen');
-        const statusLine = document.getElementById('applicationsStatusLine');
-        const statusText = document.getElementById('applicationsStatusText');
-        const isOpen = checkbox.checked ? '1' : '0';
-
-        if (checkbox.checked) {
-            statusLine.classList.remove('is-closed');
-            statusLine.classList.add('is-open');
-            statusText.textContent = 'OPEN';
-        } else {
-            statusLine.classList.remove('is-open');
-            statusLine.classList.add('is-closed');
-            statusText.textContent = 'CLOSED';
-        }
-
-        // Auto-save via AJAX
-        const formData = new FormData();
-        formData.append('save_applications_status', '1');
-        formData.append('applications_open', isOpen);
-
-        fetch('settings.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.text())
-        .then(data => {
-            showToast('Applications status updated', 'success');
-        })
-        .catch(error => {
-            console.error('Error saving status:', error);
-            showToast('Error saving status', 'error');
-            // Revert the toggle on error
-            checkbox.checked = !checkbox.checked;
-            updateApplicationsStatus();
-        });
-    }
-
-    // Password modal functions
     function showPasswordModal() {
         document.getElementById('passwordModal').style.display = 'flex';
+        document.getElementById('currentPassword').focus();
     }
 
     function hidePasswordModal() {
@@ -616,48 +226,107 @@ $applications_open = $settings['applications_open'] ?? true;
         document.getElementById('passwordForm').reset();
     }
 
-    // Language change
-    function changeLanguage(lang) {
-        document.cookie = `lang=${lang}; path=/; max-age=31536000`;
-        showToast('Language changed', 'success');
-    }
-
-    // Dark mode toggle
-    function toggleDarkMode() {
-        const isDark = document.getElementById('darkModeToggle').checked;
-        localStorage.setItem('darkMode', isDark);
-        if (isDark) {
-            document.body.style.background = '#1a1a2e';
-            document.querySelector('.admin-content').style.background = '#16213e';
-        } else {
-            document.body.style.background = '';
-            document.querySelector('.admin-content').style.background = '#f5f7fa';
+    function validateAndSubmit() {
+        const np = document.getElementById('newPassword').value;
+        const cp = document.getElementById('confirmPassword').value;
+        if (np.length < 8) {
+            showToast('New password must be at least 8 characters', 'error');
+            return;
         }
-        showToast('Theme changed', 'success');
+        if (np !== cp) {
+            showToast('Passwords do not match', 'error');
+            return;
+        }
+        document.getElementById('passwordForm').submit();
     }
 
-    // Load dark mode preference
-    if (localStorage.getItem('darkMode') === 'true') {
-        document.getElementById('darkModeToggle').checked = true;
-        document.body.style.background = '#1a1a2e';
-        document.querySelector('.admin-content').style.background = '#16213e';
+    function changeLanguage(lang) {
+        document.cookie = `lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+        showToast('Language preference saved', 'success');
     }
 
-    // Toast notification
+    function applyTheme(isLight) {
+        const root = document.documentElement;
+        if (isLight) {
+            root.style.setProperty('--admin-bg-primary', '#f5f7fb');
+            root.style.setProperty('--admin-bg-secondary', '#ffffff');
+            root.style.setProperty('--admin-bg-tertiary', '#eef2f7');
+            root.style.setProperty('--admin-sidebar-bg', 'rgba(255, 255, 255, 0.92)');
+            root.style.setProperty('--admin-topbar-bg', 'rgba(255, 255, 255, 0.95)');
+            root.style.setProperty('--admin-glass-bg', 'rgba(255, 255, 255, 0.8)');
+            root.style.setProperty('--admin-glass-border', 'rgba(15, 23, 42, 0.1)');
+            root.style.setProperty('--admin-glass-highlight', 'rgba(15, 23, 42, 0.04)');
+            root.style.setProperty('--admin-text-primary', '#0f172a');
+            root.style.setProperty('--admin-text-secondary', '#334155');
+            root.style.setProperty('--admin-text-muted', '#64748b');
+            root.style.setProperty('--admin-text-dim', '#94a3b8');
+            document.body.classList.add('admin-light-mode');
+        } else {
+            root.style.removeProperty('--admin-bg-primary');
+            root.style.removeProperty('--admin-bg-secondary');
+            root.style.removeProperty('--admin-bg-tertiary');
+            root.style.removeProperty('--admin-sidebar-bg');
+            root.style.removeProperty('--admin-topbar-bg');
+            root.style.removeProperty('--admin-glass-bg');
+            root.style.removeProperty('--admin-glass-border');
+            root.style.removeProperty('--admin-glass-highlight');
+            root.style.removeProperty('--admin-text-primary');
+            root.style.removeProperty('--admin-text-secondary');
+            root.style.removeProperty('--admin-text-muted');
+            root.style.removeProperty('--admin-text-dim');
+            document.body.classList.remove('admin-light-mode');
+        }
+    }
+
+    function toggleTheme() {
+        const isLight = document.getElementById('themeToggle').checked;
+        localStorage.setItem('adminTheme', isLight ? 'light' : 'dark');
+        applyTheme(isLight);
+        showToast(isLight ? 'Switched to Light Mode' : 'Switched to Dark Mode', 'success');
+    }
+
+    (function loadPrefs() {
+        const saved = localStorage.getItem('adminTheme');
+        const isLight = saved === 'light';
+        const toggle = document.getElementById('themeToggle');
+        if (toggle) toggle.checked = isLight;
+        applyTheme(isLight);
+    })();
+
     function showToast(message, type = 'success') {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.textContent = message;
+        const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-xmark' : 'fa-circle-exclamation';
+        toast.innerHTML = `<i class="fas ${icon}" style="margin-right: 8px;"></i>${message}`;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            setTimeout(() => toast.remove(), 200);
+        }, 2800);
     }
 
-    // Close modal when clicking outside
     document.getElementById('passwordModal').addEventListener('click', function(e) {
-        if (e.target === this) {
+        if (e.target === this) hidePasswordModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('passwordModal').style.display === 'flex') {
             hidePasswordModal();
         }
     });
     </script>
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .toast {
+            transition: opacity 0.2s, transform 0.2s;
+        }
+    </style>
 </body>
 </html>

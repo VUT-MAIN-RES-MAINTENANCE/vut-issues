@@ -8,7 +8,7 @@ $error = '';
 // Handle logout
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     logout_user();
-    header('Location: login.php');
+    header('Location: ../student/login.php');
     exit;
 }
 
@@ -67,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="bar"></div>
         </label>
         <ul class="nav-links" id="nav-links">
-            <li><a href="../index.php" id="nav-home">Home</a></li>
         </ul>
     </nav>
 

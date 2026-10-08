@@ -1,6 +1,20 @@
 <?php
 require_once 'includes/config.php';
+require_once 'includes/auth.php';
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+
+$viewer_role = get_current_user_role();
+$viewer_name = get_current_user_name();
+$viewer_id = get_current_user_id();
+$is_admin = $viewer_role === 'admin';
+$is_student = $viewer_role === 'student';
+$is_staff = $viewer_role === 'staff';
+
+$dashboard_url = '';
+$dashboard_label = '';
+if ($is_admin) { $dashboard_url = 'admin/index.php'; $dashboard_label = 'Admin Dashboard'; }
+else if ($is_staff) { $dashboard_url = 'maintenance/index.php'; $dashboard_label = 'Staff Dashboard'; }
+else if ($is_student) { $dashboard_url = 'student/index.php'; $dashboard_label = 'My Dashboard'; }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,9 +56,33 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
         <ul class="nav-links" id="nav-links">
             <li><a href="index.php" id="nav-home">Home</a></li>
             <li><a href="index.php?page=about" class="nav-btn-text" id="nav-about">About</a></li>
-            <li><a href="student/report-issue.php" class="nav-btn-text" id="nav-report">Report</a></li>
-            <li><a href="student/login.php" class="nav-btn-text" id="nav-login">Log In</a></li>
-            <li><a href="student/register.php" class="nav-btn-primary" id="nav-signup">Sign Up</a></li>
+            <?php if ($is_admin || $is_staff || $is_student): ?>
+                <?php if (!empty($dashboard_url)): ?>
+                    <li><a href="<?php echo htmlspecialchars($dashboard_url); ?>" class="nav-btn-text" id="nav-dashboard"><i class="fas fa-gauge-high"></i> <?php echo htmlspecialchars($dashboard_label); ?></a></li>
+                <?php endif; ?>
+                <li>
+                    <span class="nav-user-label" id="nav-user-label" title="Signed in as <?php echo htmlspecialchars($viewer_name ?? ''); ?>">
+                        <?php if ($is_admin): ?><i class="fas fa-shield-halved" style="color:#d4af37;"></i>
+                        <?php elseif ($is_staff): ?><i class="fas fa-screwdriver-wrench" style="color:#8b5cf6;"></i>
+                        <?php else: ?><i class="fas fa-user-graduate" style="color:#3b82f6;"></i><?php endif; ?>
+                        <?php echo htmlspecialchars($viewer_name ?? 'Account'); ?>
+                    </span>
+                </li>
+                <li>
+                    <?php
+                        $logout_target = '';
+                        if ($is_admin) $logout_target = 'admin/login.php?action=logout';
+                        else if ($is_staff) $logout_target = 'maintenance/login.php?action=logout';
+                        else if ($is_student) $logout_target = 'student/login.php?action=logout';
+                    ?>
+                    <a href="<?php echo htmlspecialchars($logout_target); ?>" class="nav-btn-text" id="nav-logout">
+                        <i class="fas fa-right-from-bracket"></i> Log Out
+                    </a>
+                </li>
+            <?php else: ?>
+                <li><a href="student/login.php" class="nav-btn-text" id="nav-login">Log In</a></li>
+                <li><a href="student/register.php" class="nav-btn-primary" id="nav-signup">Sign Up</a></li>
+            <?php endif; ?>
         </ul>
     </nav>
 
@@ -59,8 +97,20 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
             </div>
         </div>
         <div class="hero-buttons">
-            <a href="student/report-issue.php" class="btn btn-primary" id="btn-services">Report issue <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            <a href="index.php?page=about" class="btn btn-secondary" id="btn-about">About VUT</a>
+            <?php if ($is_admin || $is_staff || $is_student): ?>
+                <?php if (!empty($dashboard_url)): ?>
+                    <a href="<?php echo htmlspecialchars($dashboard_url); ?>" class="btn btn-primary" id="btn-dashboard-back">
+                        <?php if ($is_admin): ?><i class="fas fa-shield-halved" aria-hidden="true"></i> Back to <?php echo htmlspecialchars($dashboard_label);
+                        elseif ($is_staff): ?><i class="fas fa-screwdriver-wrench" aria-hidden="true"></i> Back to <?php echo htmlspecialchars($dashboard_label);
+                        else: ?><i class="fas fa-gauge-high" aria-hidden="true"></i> Go to <?php echo htmlspecialchars($dashboard_label);
+                        endif; ?>
+                    </a>
+                <?php endif; ?>
+                <a href="index.php?page=about" class="btn btn-secondary" id="btn-about">About VUT</a>
+            <?php else: ?>
+                <a href="student/login.php" class="btn btn-primary" id="btn-services">Log In to Report <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                <a href="index.php?page=about" class="btn btn-secondary" id="btn-about">About VUT</a>
+            <?php endif; ?>
         </div>
     </main>
     <section class="home-service-strip" aria-labelledby="home-service-title">
@@ -70,9 +120,15 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
                 <h2 id="home-service-title">What needs attention?</h2>
             </div>
             <div class="home-service-links">
-                <a href="student/report-issue.php"><i class="fas fa-faucet" aria-hidden="true"></i><span>Leaks &amp; plumbing</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php"><i class="fas fa-bolt" aria-hidden="true"></i><span>Electrical</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php"><i class="fas fa-door-open" aria-hidden="true"></i><span>Doors &amp; fittings</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <?php if ($is_student): ?>
+                    <a href="student/report-issue.php"><i class="fas fa-faucet" aria-hidden="true"></i><span>Leaks &amp; plumbing</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                    <a href="student/report-issue.php"><i class="fas fa-bolt" aria-hidden="true"></i><span>Electrical</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                    <a href="student/report-issue.php"><i class="fas fa-door-open" aria-hidden="true"></i><span>Doors &amp; fittings</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <?php else: ?>
+                    <a href="<?php echo !empty($dashboard_url) ? htmlspecialchars($dashboard_url) : 'student/login.php'; ?>"><i class="fas fa-faucet" aria-hidden="true"></i><span>Leaks &amp; plumbing</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                    <a href="<?php echo !empty($dashboard_url) ? htmlspecialchars($dashboard_url) : 'student/login.php'; ?>"><i class="fas fa-bolt" aria-hidden="true"></i><span>Electrical</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                    <a href="<?php echo !empty($dashboard_url) ? htmlspecialchars($dashboard_url) : 'student/login.php'; ?>"><i class="fas fa-door-open" aria-hidden="true"></i><span>Doors &amp; fittings</span><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -84,7 +140,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
                 <h1 id="about-title">A better stay<br>starts with <em>care.</em></h1>
                 <p>We keep student residences working, safe, and comfortable, with a maintenance team that is ready when you need us.</p>
                 <div class="about-actions">
-                    <a class="about-button about-button-primary" href="student/report-issue.php">Report an issue <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                    <a class="about-button about-button-primary" href="student/login.php">Log In to Report <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
                     <a class="about-text-link" href="#about-services">Explore our services <i class="fas fa-arrow-down" aria-hidden="true"></i></a>
                 </div>
             </div>
@@ -124,31 +180,31 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
             <article class="about-principle about-principle-note" data-reveal>
                 <span class="about-principle-number">THE WAY WE WORK</span>
                 <p>Clear communication.<br>Skilled hands.<br>Respect for your space.</p>
-                <a href="student/report-issue.php" aria-label="Report a maintenance issue"><i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                <a href="student/login.php" aria-label="Log in to report a maintenance issue"><i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             </article>
         </section>
 
         <section class="about-services" id="about-services" aria-labelledby="about-services-title">
             <div class="about-services-heading" data-reveal>
                 <div><span class="about-eyebrow">PRACTICAL HELP, RIGHT AT HOME</span><h2 id="about-services-title">What we take care of.</h2></div>
-                <a class="about-inline-link" href="student/report-issue.php">Request a repair <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                <a class="about-inline-link" href="student/login.php">Request a repair <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             </div>
             <div class="about-service-list">
-                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>01</span><i class="fas fa-faucet" aria-hidden="true"></i><strong>Plumbing &amp; leaks</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>02</span><i class="fas fa-bolt" aria-hidden="true"></i><strong>Electrical &amp; plugs</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>03</span><i class="fas fa-lightbulb" aria-hidden="true"></i><strong>Lighting</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>04</span><i class="fas fa-door-open" aria-hidden="true"></i><strong>Doors &amp; windows</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>05</span><i class="fas fa-wifi" aria-hidden="true"></i><strong>WiFi problems</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>06</span><i class="fas fa-fire-burner" aria-hidden="true"></i><strong>Stoves &amp; appliances</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>07</span><i class="fas fa-wind" aria-hidden="true"></i><strong>Heating &amp; cooling</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>08</span><i class="fas fa-bed" aria-hidden="true"></i><strong>Furniture &amp; fittings</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                <a href="student/report-issue.php" class="about-service-item" data-reveal><span>09</span><i class="fas fa-paint-roller" aria-hidden="true"></i><strong>Painting &amp; repairs</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/login.php" class="about-service-item" data-reveal><span>01</span><i class="fas fa-faucet" aria-hidden="true"></i><strong>Plumbing &amp; leaks</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/login.php" class="about-service-item" data-reveal><span>02</span><i class="fas fa-bolt" aria-hidden="true"></i><strong>Electrical &amp; plugs</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/login.php" class="about-service-item" data-reveal><span>03</span><i class="fas fa-lightbulb" aria-hidden="true"></i><strong>Lighting</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/login.php" class="about-service-item" data-reveal><span>04</span><i class="fas fa-door-open" aria-hidden="true"></i><strong>Doors &amp; windows</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/login.php" class="about-service-item" data-reveal><span>05</span><i class="fas fa-wifi" aria-hidden="true"></i><strong>WiFi problems</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/login.php" class="about-service-item" data-reveal><span>06</span><i class="fas fa-fire-burner" aria-hidden="true"></i><strong>Stoves &amp; appliances</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/login.php" class="about-service-item" data-reveal><span>07</span><i class="fas fa-wind" aria-hidden="true"></i><strong>Heating &amp; cooling</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/login.php" class="about-service-item" data-reveal><span>08</span><i class="fas fa-bed" aria-hidden="true"></i><strong>Furniture &amp; fittings</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                <a href="student/login.php" class="about-service-item" data-reveal><span>09</span><i class="fas fa-paint-roller" aria-hidden="true"></i><strong>Painting &amp; repairs</strong><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
             </div>
             <div class="about-response-row" data-reveal>
                 <div class="about-response-mark"><i class="fas fa-headset" aria-hidden="true"></i></div>
                 <div><span>WHEN SOMETHING NEEDS ATTENTION</span><h3>We’re here to help, day or night.</h3></div>
                 <p>For urgent maintenance or everyday repairs, tell us what’s wrong and our team will take it from there.</p>
-                <a class="about-button about-button-dark" href="student/report-issue.php">Get support <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                <a class="about-button about-button-dark" href="student/login.php">Get support <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             </div>
         </section>
     </main>
