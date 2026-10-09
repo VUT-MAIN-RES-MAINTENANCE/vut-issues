@@ -79,6 +79,7 @@ foreach ($staff as $s) {
 }
 
 $display_date = date('d/m/Y');
+$display_time = date('H:i');
 $display_name = !empty($user['name']) ? $user['name'] : 'System Administrator';
 $display_email = $user['email'] ?? '';
 ?>
@@ -124,7 +125,7 @@ $display_email = $user['email'] ?? '';
                 <div class="admin-header-info">
                     <div class="admin-header-date" title="Today's date">
                         <i class="fa-regular fa-calendar"></i>
-                        <span><?php echo htmlspecialchars($display_date); ?></span>
+                        <span><?php echo htmlspecialchars($display_date); ?> <?php echo htmlspecialchars($display_time); ?></span>
                     </div>
                     <div class="admin-header-user">
                         <div class="admin-header-avatar" title="<?php echo htmlspecialchars($display_name); ?>">
@@ -158,7 +159,7 @@ $display_email = $user['email'] ?? '';
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
                         <div class="form-group">
                             <label><i class="fas fa-user" style="margin-right: 6px; color: var(--admin-text-dim); font-size: 0.8rem;"></i>Full Name</label>
-                            <input type="text" name="name" placeholder="John Doe" required>
+                            <input type="text" name="name" placeholder="Risima Kubayi" required>
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-envelope" style="margin-right: 6px; color: var(--admin-text-dim); font-size: 0.8rem;"></i>Email</label>

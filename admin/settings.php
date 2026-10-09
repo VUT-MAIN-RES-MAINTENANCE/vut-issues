@@ -46,6 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
 }
 
 $settings = json_read(SETTINGS_FILE);
+
+$display_date = date('d/m/Y');
+$display_time = date('H:i');
+$display_name = !empty($user['name']) ? $user['name'] : 'System Administrator';
+$display_email = $user['email'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -86,6 +91,23 @@ $settings = json_read(SETTINGS_FILE);
         <main class="admin-content">
             <div class="admin-header">
                 <h1>System Settings</h1>
+                <div class="admin-header-info">
+                    <div class="admin-header-date" title="Today's date">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span><?php echo htmlspecialchars($display_date); ?> <?php echo htmlspecialchars($display_time); ?></span>
+                    </div>
+                    <div class="admin-header-user">
+                        <div class="admin-header-avatar" title="<?php echo htmlspecialchars($display_name); ?>">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="admin-header-user-details">
+                            <div class="admin-header-user-name"><?php echo htmlspecialchars($display_name); ?></div>
+                            <?php if (!empty($display_email)): ?>
+                                <div class="admin-header-user-email"><?php echo htmlspecialchars($display_email); ?></div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <?php if ($error): ?>
