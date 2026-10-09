@@ -1,1 +1,12 @@
-[]
+[
+    {
+        "id": "staff_67f8a9b4e3c2d1",
+        "name": "John Maintenance",
+        "email": "staff@vut.ac.za",
+        "password": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+        "phone": "+27 16 950 1234",
+        "role": "staff",
+        "created_at": "2026-10-09 19:00:00",
+        "updated_at": "2026-10-09 19:00:00"
+    }
+]
