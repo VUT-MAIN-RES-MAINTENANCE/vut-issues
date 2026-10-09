@@ -2252,9 +2252,9 @@ textarea.form-control {
 }
 
 .role-option-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;

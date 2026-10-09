@@ -86,6 +86,7 @@ $in_progress_count = count(array_filter(json_read(MAINTENANCE_REQUESTS_FILE), fn
 $completed_count = count(array_filter(json_read(MAINTENANCE_REQUESTS_FILE), fn($i) => ($i['status'] ?? 'pending') === 'completed'));
 
 $display_date = date('d/m/Y');
+$display_time = date('H:i');
 $display_name = !empty($user['name']) ? $user['name'] : 'System Administrator';
 $display_email = $user['email'] ?? '';
 ?>
@@ -127,22 +128,22 @@ $display_email = $user['email'] ?? '';
 
         <main class="admin-content">
             <div class="admin-header">
-                <div class="admin-header-main">
-                    <h1>Maintenance Issues</h1>
-                    <div class="admin-header-sub">
+                <h1>Maintenance Issues</h1>
+                <div class="admin-header-info">
+                    <div class="admin-header-date" title="Today's date">
                         <i class="fa-regular fa-calendar"></i>
-                        <span><?php echo htmlspecialchars($display_date); ?></span>
+                        <span><?php echo htmlspecialchars($display_date); ?> <?php echo htmlspecialchars($display_time); ?></span>
                     </div>
-                </div>
-                <div class="admin-header-user">
-                    <div class="admin-header-avatar" title="<?php echo htmlspecialchars($display_name); ?>">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <div class="admin-header-user-details">
-                        <div class="admin-header-user-name"><?php echo htmlspecialchars($display_name); ?></div>
-                        <?php if (!empty($display_email)): ?>
-                            <div class="admin-header-user-email"><?php echo htmlspecialchars($display_email); ?></div>
-                        <?php endif; ?>
+                    <div class="admin-header-user">
+                        <div class="admin-header-avatar" title="<?php echo htmlspecialchars($display_name); ?>">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="admin-header-user-details">
+                            <div class="admin-header-user-name"><?php echo htmlspecialchars($display_name); ?></div>
+                            <?php if (!empty($display_email)): ?>
+                                <div class="admin-header-user-email"><?php echo htmlspecialchars($display_email); ?></div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>

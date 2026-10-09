@@ -475,5 +475,59 @@
         "description": "Admin logged in: Administrator",
         "related_issue": null,
         "timestamp": "2026-10-08 13:20:00"
+    },
+    {
+        "id": "activity_6ac7a156518dab3954c4f",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-08 13:57:42"
+    },
+    {
+        "id": "activity_6ac8a11d60e082b9ffc1f",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-09 08:09:01"
+    },
+    {
+        "id": "activity_6ac8a1a3bb399f861793c",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-09 08:11:15"
+    },
+    {
+        "id": "activity_6ac8a9d108e0dd807ffcb",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-09 10:46:09"
+    },
+    {
+        "id": "activity_6ac8a9d8499d631019130",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-09 10:46:16"
+    },
+    {
+        "id": "activity_6ac8aa803120f075bff2d",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-09 10:49:04"
     }
 ]

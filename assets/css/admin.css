@@ -336,12 +336,12 @@ html, body:has(.admin-dashboard) {
 }
 
 .admin-content {
-    padding: 2rem 2.25rem;
+    padding: 6rem 2.25rem 2rem;
     margin-left: var(--sidebar-width);
     max-width: calc(100vw - var(--sidebar-width));
     overflow-x: hidden;
     overflow-y: auto;
-    height: calc(100vh - var(--topbar-height));
+    height: 100vh;
     min-height: 0;
     scrollbar-gutter: stable;
 }
@@ -350,14 +350,18 @@ html, body:has(.admin-dashboard) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: sticky;
+    position: fixed;
     top: 0;
-    background: var(--admin-bg-primary);
-    margin: -2rem calc(-1 * 2.25rem) 2rem;
-    padding: 1rem 2.25rem 1rem;
+    left: var(--sidebar-width);
+    right: 0;
+    background: transparent;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 1rem 2.25rem;
     z-index: 150;
     isolation: isolate;
     min-height: 74px;
+    border-bottom: 1px solid var(--admin-glass-border);
 }
 
 .admin-header::after {
