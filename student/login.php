@@ -11,7 +11,7 @@ $form_data = [];
 // Handle logout
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     logout_user();
-    header('Location: login.php');
+    header('Location: ../index.php');
     exit;
 }
 

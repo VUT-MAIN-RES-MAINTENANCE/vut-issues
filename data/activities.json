@@ -565,5 +565,221 @@
         "description": "Student logged in: Mavangwa",
         "related_issue": null,
         "timestamp": "2026-10-10 09:45:27"
+    },
+    {
+        "id": "activity_6ac9f657b88b6241b90a7",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "report_issue",
+        "description": "Reported issue: table",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 10:24:55"
+    },
+    {
+        "id": "activity_6ac9f67d902c516304b15",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-10 10:25:33"
+    },
+    {
+        "id": "activity_6ac9f69d95e184b0682be",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-10 10:26:05"
+    },
+    {
+        "id": "activity_6ac9f86747407cc426ada",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-10 10:33:43"
+    },
+    {
+        "id": "activity_6ac9f985f03bafc2cc800",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-10 10:38:29"
+    },
+    {
+        "id": "activity_6ac9f991548acf71846ff",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-10 10:38:41"
+    },
+    {
+        "id": "activity_6ac9fbc0788de15f7103c",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-10 10:48:00"
+    },
+    {
+        "id": "activity_6ac9fdbfa3b42ed709894",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-10 10:56:31"
+    },
+    {
+        "id": "activity_6ac9fe08661184fac3517",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-10 10:57:44"
+    },
+    {
+        "id": "activity_6ac9fe2590a59d52d6e8f",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-10 10:58:13"
+    },
+    {
+        "id": "activity_6ac9feb3b95c526c05e96",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-10 11:00:35"
+    },
+    {
+        "id": "activity_6ac9ff2b092bcd93ec076",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:02:35"
+    },
+    {
+        "id": "activity_6ac9ff8be79691a6ad54d",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:04:11"
+    },
+    {
+        "id": "activity_6ac9ffaec5ddd6b292165",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:04:46"
+    },
+    {
+        "id": "activity_6aca00048a46c22c490d4",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:06:12"
+    },
+    {
+        "id": "activity_6aca00123b8427e4409f4",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:06:26"
+    },
+    {
+        "id": "activity_6aca0029b20cce93a72e5",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:06:49"
+    },
+    {
+        "id": "activity_6aca003493727188491f3",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:07:00"
+    },
+    {
+        "id": "activity_6aca00640443190c58416",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:07:48"
+    },
+    {
+        "id": "activity_6aca00704a3da601fc22a",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:08:00"
+    },
+    {
+        "id": "activity_6aca007b9c00a3a1d0450",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:08:11"
+    },
+    {
+        "id": "activity_6aca0083ae31d1cc88f7d",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_status",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-10 11:08:19"
+    },
+    {
+        "id": "activity_6aca02ef47cd7fcbb51db",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-10 11:18:39"
+    },
+    {
+        "id": "activity_6aca030c4d5d53542b0f4",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-10 11:19:08"
     }
 ]

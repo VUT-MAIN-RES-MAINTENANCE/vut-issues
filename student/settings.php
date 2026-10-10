@@ -66,6 +66,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -123,6 +124,9 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         <main class="student-main">
             <div class="student-header">
                 <div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">
+                        <?php echo date('l, F j, Y'); ?> · <?php echo date('g:i A'); ?>
+                    </div>
                     <h1>Settings</h1>
                     <p>Manage your account preferences and settings.</p>
                 </div>
@@ -149,20 +153,20 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                 </div>
             <?php endif; ?>
 
-            <div style="background: var(--glass-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--glass-border); margin-bottom: 2rem;">
+            <div class="settings-card">
                 <!-- Language Section -->
-                <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
-                    <h4 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; font-size: 1.1rem;">
-                        <i class="fas fa-globe" style="color: var(--accent-color);"></i> Language
+                <div class="settings-section">
+                    <h4 class="settings-section-title">
+                        <i class="fas fa-globe"></i> Language
                     </h4>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <label style="display: block; font-weight: 500; margin-bottom: 0.25rem;">Interface Language</label>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">Choose your preferred display language.</p>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <label>Interface Language</label>
+                            <p>Choose your preferred display language.</p>
                         </div>
-                        <select style="padding: 0.5rem 1rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 6px; color: white; font-size: 0.9rem;" onchange="changeLanguage(this.value)">
-                            <option value="en" <?php echo (!isset($_COOKIE['lang']) || $_COOKIE['lang'] === 'en') ? 'selected' : ''; ?>>
-                                English
+                        <select class="form-control" style="width: 220px;" onchange="changeLanguage(this.value)">
+                            <option value="en" <?php echo (!isset($_COOKIE['lang']) || $_COOKIE['lang'] === 'en') ? 'selected' : ''; ?>
+                                <i class="fas fa-flag-usa"></i> English
                             </option>
                             <option value="ts" <?php echo (isset($_COOKIE['lang']) && $_COOKIE['lang'] === 'ts') ? 'selected' : ''; ?>>Xitsonga</option>
                             <option value="zu" <?php echo (isset($_COOKIE['lang']) && $_COOKIE['lang'] === 'zu') ? 'selected' : ''; ?>>isiZulu</option>
@@ -171,14 +175,14 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                 </div>
 
                 <!-- Appearance Section -->
-                <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
-                    <h4 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; font-size: 1.1rem;">
-                        <i class="fas fa-palette" style="color: var(--accent-color);"></i> Appearance
+                <div class="settings-section">
+                    <h4 class="settings-section-title">
+                        <i class="fas fa-palette"></i> Appearance
                     </h4>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <label style="display: block; font-weight: 500; margin-bottom: 0.25rem;">Light Mode</label>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">Toggle between dark and light interface theme.</p>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <label>Light Mode</label>
+                            <p>Toggle between dark (default) and light interface theme.</p>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
@@ -188,41 +192,41 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                 </div>
 
                 <!-- Account Section -->
-                <div>
-                    <h4 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; font-size: 1.1rem;">
-                        <i class="fas fa-user-shield" style="color: var(--accent-color);"></i> Account
+                <div class="settings-section">
+                    <h4 class="settings-section-title">
+                        <i class="fas fa-user-shield"></i> Account
                     </h4>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                        <div>
-                            <label style="display: block; font-weight: 500; margin-bottom: 0.25rem;">Change Password</label>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">Update your account password regularly.</p>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <label>Change Password</label>
+                            <p>Update your account password regularly.</p>
                         </div>
-                        <button onclick="showPasswordModal()" style="padding: 0.5rem 1rem; background: var(--accent-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <button class="btn btn-primary" onclick="showPasswordModal()">
                             <i class="fas fa-key"></i> Change Password
                         </button>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
-                        <div>
-                            <label style="display: block; font-weight: 500; margin-bottom: 0.25rem;">Current Session</label>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    <div class="settings-item" style="border-top: 1px solid var(--glass-border); margin-top: 0.5rem; padding-top: 1.25rem;">
+                        <div class="settings-item-info">
+                            <label>Current Session</label>
+                            <p>
                                 Signed in as <strong style="color: var(--accent-color);"><?php echo htmlspecialchars($user['email']); ?></strong>
                                 <br>
-                                <span style="font-size: 0.8rem;">Role: Student</span>
+                                <span style="font-size: 0.78rem;">Role: Student</span>
                             </p>
                         </div>
-                        <button onclick="if(confirm('Sign out of student panel?')) window.location.href='login.php?action=logout';" style="padding: 0.5rem 1rem; background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <button class="btn btn-danger" onclick="if(confirm('Sign out of student panel?')) window.location.href='login.php?action=logout';">
                             <i class="fas fa-right-from-bracket"></i> Sign Out
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div style="background: linear-gradient(135deg, rgba(79, 143, 192, 0.08) 0%, rgba(79, 143, 192, 0.04) 100%); padding: 1.25rem 1.5rem; border-radius: 12px; border: 1px solid rgba(79, 143, 192, 0.15); display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(79, 143, 192, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <div style="margin-top: 1.75rem; padding: 1.25rem 1.5rem; border-radius: var(--admin-radius-lg); background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(212, 175, 55, 0.06) 100%); border: 1px solid rgba(6, 182, 212, 0.15); display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(212, 175, 55, 0.18)); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                     <i class="fas fa-circle-info" style="font-size: 1.25rem; color: var(--accent-color);"></i>
                 </div>
                 <div>
-                    <div style="font-weight: 700;">System Status: <span style="color: #22c55e;"><i class="fas fa-circle" style="font-size: 0.5rem; margin-right: 4px;"></i>Operational</span></div>
+                    <div style="font-weight: 700; color: var(--text-primary);">System Status: <span style="color: #22c55e;"><i class="fas fa-circle" style="font-size: 0.5rem; margin-right: 4px; animation: pulse 2s infinite;"></i>Operational</span></div>
                     <div style="font-size: 0.825rem; color: var(--text-muted); margin-top: 2px;">
                         Settings last updated: <?php echo isset($settings['updated_at']) ? date('M d, Y @ H:i', strtotime($settings['updated_at'])) : 'Never'; ?>
                     </div>
@@ -232,34 +236,36 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
     </div>
 
     <!-- Password Change Modal -->
-    <div id="passwordModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 2000; align-items: center; justify-content: center;">
-        <div style="background: var(--bg-color); padding: 2rem; border-radius: 12px; border: 1px solid var(--glass-border); max-width: 450px; width: 90%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h3 style="margin: 0; font-size: 1.25rem;"><i class="fas fa-key" style="margin-right: 8px; color: var(--accent-color);"></i>Change Password</h3>
-                <button onclick="hidePasswordModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+    <div class="modal-wrap" id="passwordModal" style="display: none;">
+        <div class="modal">
+            <div class="modal-head">
+                <h3><i class="fas fa-key" style="margin-right: 8px; color: var(--accent-color);"></i>Change Password</h3>
+                <button class="modal-close" onclick="hidePasswordModal()">&times;</button>
             </div>
-            <form id="passwordForm" method="POST" action="">
-                <input type="hidden" name="change_password" value="1">
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Current Password</label>
-                    <input type="password" id="currentPassword" name="current_password" placeholder="Enter your current password" required style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 6px; color: white; font-size: 0.95rem;">
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">New Password</label>
-                    <input type="password" id="newPassword" name="new_password" placeholder="Min. 8 characters" required minlength="8" style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 6px; color: white; font-size: 0.95rem;">
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Confirm New Password</label>
-                    <input type="password" id="confirmPassword" name="confirm_password" placeholder="Re-enter new password" required minlength="8" style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 6px; color: white; font-size: 0.95rem;">
-                </div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-bottom: 1.5rem;">
-                    <i class="fas fa-shield-halved" style="color: #22c55e;"></i>
-                    Passwords are securely hashed before storage.
-                </div>
-            </form>
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button onclick="hidePasswordModal()" style="padding: 0.5rem 1rem; background: var(--glass-bg); color: white; border: 1px solid var(--glass-border); border-radius: 6px; cursor: pointer;">Cancel</button>
-                <button onclick="validateAndSubmit()" style="padding: 0.5rem 1rem; background: var(--accent-color); color: white; border: none; border-radius: 6px; cursor: pointer;">
+            <div class="modal-body">
+                <form id="passwordForm" method="POST" action="">
+                    <input type="hidden" name="change_password" value="1">
+                    <div class="form-group">
+                        <label><i class="fas fa-lock" style="margin-right: 6px; color: var(--text-dim); font-size: 0.8rem;"></i>Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" name="current_password" placeholder="Enter your current password" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-key" style="margin-right: 6px; color: var(--text-dim); font-size: 0.8rem;"></i>New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="new_password" placeholder="Min. 8 characters" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-double" style="margin-right: 6px; color: var(--text-dim); font-size: 0.8rem;"></i>Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password" placeholder="Re-enter new password" required minlength="8">
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-shield-halved" style="color: #22c55e;"></i>
+                        Passwords are securely hashed before storage.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-secondary" onclick="hidePasswordModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="validateAndSubmit()">
                     <i class="fas fa-save"></i> Update Password
                 </button>
             </div>
@@ -281,11 +287,11 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         const np = document.getElementById('newPassword').value;
         const cp = document.getElementById('confirmPassword').value;
         if (np.length < 8) {
-            alert('New password must be at least 8 characters');
+            showToast('New password must be at least 8 characters', 'error');
             return;
         }
         if (np !== cp) {
-            alert('Passwords do not match');
+            showToast('Passwords do not match', 'error');
             return;
         }
         document.getElementById('passwordForm').submit();
@@ -293,13 +299,38 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
 
     function changeLanguage(lang) {
         document.cookie = `lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
-        alert('Language preference saved');
+        showToast('Language preference saved', 'success');
     }
 
     function applyTheme(isLight) {
+        const root = document.documentElement;
         if (isLight) {
+            root.style.setProperty('--bg-primary', '#f5f7fb');
+            root.style.setProperty('--bg-secondary', '#ffffff');
+            root.style.setProperty('--bg-tertiary', '#eef2f7');
+            root.style.setProperty('--sidebar-bg', 'rgba(255, 255, 255, 0.92)');
+            root.style.setProperty('--topbar-bg', 'rgba(255, 255, 255, 0.95)');
+            root.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.8)');
+            root.style.setProperty('--glass-border', 'rgba(15, 23, 42, 0.1)');
+            root.style.setProperty('--glass-highlight', 'rgba(15, 23, 42, 0.04)');
+            root.style.setProperty('--text-primary', '#0f172a');
+            root.style.setProperty('--text-secondary', '#334155');
+            root.style.setProperty('--text-muted', '#64748b');
+            root.style.setProperty('--text-dim', '#94a3b8');
             document.body.classList.add('student-light-mode');
         } else {
+            root.style.removeProperty('--bg-primary');
+            root.style.removeProperty('--bg-secondary');
+            root.style.removeProperty('--bg-tertiary');
+            root.style.removeProperty('--sidebar-bg');
+            root.style.removeProperty('--topbar-bg');
+            root.style.removeProperty('--glass-bg');
+            root.style.removeProperty('--glass-border');
+            root.style.removeProperty('--glass-highlight');
+            root.style.removeProperty('--text-primary');
+            root.style.removeProperty('--text-secondary');
+            root.style.removeProperty('--text-muted');
+            root.style.removeProperty('--text-dim');
             document.body.classList.remove('student-light-mode');
         }
     }
@@ -308,16 +339,32 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         const isLight = document.getElementById('themeToggle').checked;
         localStorage.setItem('studentTheme', isLight ? 'light' : 'dark');
         applyTheme(isLight);
-        alert(isLight ? 'Switched to Light Mode' : 'Switched to Dark Mode');
+        showToast(isLight ? 'Switched to Light Mode' : 'Switched to Dark Mode', 'success');
     }
 
     (function loadPrefs() {
         const saved = localStorage.getItem('studentTheme');
-        const isLight = saved === null ? true : saved === 'light';
+        const isLight = saved === 'light';
         const toggle = document.getElementById('themeToggle');
         if (toggle) toggle.checked = isLight;
         applyTheme(isLight);
     })();
+
+    function showToast(message, type = 'success') {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-xmark' : 'fa-circle-exclamation';
+        toast.innerHTML = `<i class="fas ${icon}" style="margin-right: 8px;"></i>${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            setTimeout(() => toast.remove(), 200);
+        }, 2800);
+    }
 
     document.getElementById('passwordModal').addEventListener('click', function(e) {
         if (e.target === this) hidePasswordModal();
@@ -329,5 +376,14 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         }
     });
     </script>
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .toast {
+            transition: opacity 0.2s, transform 0.2s;
+        }
+    </style>
 </body>
 </html>

@@ -106,6 +106,9 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         <main class="student-main">
             <div class="student-header">
                 <div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">
+                        <?php echo date('l, F j, Y'); ?> · <?php echo date('g:i A'); ?>
+                    </div>
                     <h1>Dashboard</h1>
                     <p>Welcome back, <?php echo htmlspecialchars($user['name']); ?>. Here's your maintenance overview.</p>
                 </div>
@@ -121,7 +124,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
             </div>
 
             <!-- Stats Grid -->
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2rem; margin-bottom: 2.5rem;">
                 <div style="background: var(--glass-bg); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--glass-border); transition: all 0.3s ease;">
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
                         <h3 style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-main);"><?php echo $total_issues; ?></h3>

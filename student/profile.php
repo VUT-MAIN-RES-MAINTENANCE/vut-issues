@@ -19,6 +19,7 @@ $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $residence = $_POST['residence'] ?? '';
+    $block = trim($_POST['block'] ?? '');
     $room = trim($_POST['room'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
 
@@ -28,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $updates = [
             'name' => htmlspecialchars($name),
             'residence' => htmlspecialchars($residence),
+            'block' => htmlspecialchars($block),
             'room' => htmlspecialchars($room),
             'phone' => htmlspecialchars($phone),
             'updated_at' => date('Y-m-d H:i:s')
@@ -114,6 +116,9 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         <main class="student-main">
             <div class="student-header">
                 <div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">
+                        <?php echo date('l, F j, Y'); ?> · <?php echo date('g:i A'); ?>
+                    </div>
                     <h1>My Profile</h1>
                     <p>Manage your student profile information.</p>
                 </div>
@@ -140,7 +145,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                 </div>
             <?php endif; ?>
 
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 2rem;">
                 <div style="background: var(--glass-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--glass-border);">
                     <form method="POST" action="">
                         <div style="margin-bottom: 1.5rem;">
@@ -165,6 +170,11 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                                 <option value="Meropa" <?php echo ($user['residence'] ?? '') === 'Meropa' ? 'selected' : ''; ?>>Meropa</option>
                                 <option value="Khayelethu" <?php echo ($user['residence'] ?? '') === 'Khayelethu' ? 'selected' : ''; ?>>Khayelethu</option>
                             </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Block Number</label>
+                            <input type="text" name="block" value="<?php echo htmlspecialchars($user['block'] ?? ''); ?>" placeholder="e.g., 1, A, Main" style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: white; font-size: 0.95rem;">
                         </div>
                         
                         <div style="margin-bottom: 1.5rem;">

@@ -5,10 +5,11 @@
         "email": "andzanimavangwa88@gmail.com",
         "password": "$2y$12$dRXMMTbbGg4ibiN0pmw91eqG7y\/tB9VsQYpKSIWtnDLoTokNXaNle",
         "role": "student",
-        "phone": "",
+        "phone": "0717758089",
         "created_at": "2026-10-02 10:16:12",
-        "updated_at": "2026-10-02 10:16:12",
-        "residence": "",
-        "room": ""
+        "updated_at": "2026-10-10 10:24:01",
+        "residence": "Nkandla",
+        "room": "F10",
+        "block": "10"
     }
 ]

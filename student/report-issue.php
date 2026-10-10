@@ -199,6 +199,9 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         <main class="student-main">
             <div class="student-header">
                 <div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">
+                        <?php echo date('l, F j, Y'); ?> · <?php echo date('g:i A'); ?>
+                    </div>
                     <h1>Report Issue</h1>
                     <p>Found something that needs fixing? Let us know and we'll handle it.</p>
                 </div>

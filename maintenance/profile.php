@@ -103,7 +103,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                     <i class="fas fa-arrow-left"></i>
                     Back to Home
                 </a>
-                <a href="login.php?action=logout">
+                <a href="#" onclick="window.location.href='../student/login.php?action=logout';">
                     <i class="fas fa-sign-out-alt"></i>
                     Log Out
                 </a>
