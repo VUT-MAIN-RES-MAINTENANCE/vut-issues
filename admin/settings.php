@@ -83,7 +83,7 @@ $display_email = $user['email'] ?? '';
                 <li><a href="issues.php"><i class="fas fa-clipboard-list"></i> Issues</a></li>
                 <li><a href="settings.php" class="active"><i class="fas fa-cog"></i> Settings</a></li>
                 <li>
-                    <a href="login.php?action=logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <a href="../student/login.php?action=logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </li>
             </ul>
         </aside>
@@ -179,7 +179,7 @@ $display_email = $user['email'] ?? '';
                                 <span style="font-size: 0.78rem;">Role: System Administrator</span>
                             </p>
                         </div>
-                        <button class="btn btn-danger" onclick="if(confirm('Sign out of admin panel?')) window.location.href='login.php?action=logout';">
+                        <button class="btn btn-danger" onclick="if(confirm('Sign out of admin panel?')) window.location.href='../student/login.php?action=logout';">
                             <i class="fas fa-right-from-bracket"></i> Sign Out
                         </button>
                     </div>

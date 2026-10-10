@@ -36,7 +36,7 @@ function getStatusBadge($status) {
         STATUS_PENDING => '<span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Pending</span>',
         STATUS_ASSIGNED => '<span style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Assigned</span>',
         STATUS_IN_PROGRESS => '<span style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">In Progress</span>',
-        STATUS_COMPLETED => '<span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Completed</span>'
+        STATUS_COMPLETED => '<span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Fixed</span>'
     ];
     return $badges[$status] ?? $status;
 }
@@ -111,6 +111,9 @@ function getStatusBadge($status) {
         <main class="student-main">
             <div class="student-header">
                 <div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">
+                        <?php echo date('l, F j, Y'); ?> · <?php echo date('g:i A'); ?>
+                    </div>
                     <h1>My Issues</h1>
                     <p>View and track your reported maintenance issues.</p>
                 </div>
@@ -126,14 +129,14 @@ function getStatusBadge($status) {
             </div>
 
             <?php if (empty($my_issues)): ?>
-                <div style="background: var(--glass-bg); padding: 3rem; border-radius: 12px; border: 1px solid var(--glass-border); text-align: center;">
+                <div style="background: var(--glass-bg); padding: 3rem; border-radius: 12px; border: 1px solid var(--glass-border); text-align: center; margin-top: 2rem;">
                     <i class="fas fa-clipboard-list" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
                     <h3 style="margin-bottom: 0.5rem;">No Issues Reported Yet</h3>
                     <p style="color: var(--text-muted); margin-bottom: 1.5rem;">You haven't reported any maintenance issues yet.</p>
                     <a href="report-issue.php" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-color); color: white; text-decoration: none; border-radius: 8px; font-weight: 500;">Report Your First Issue</a>
                 </div>
             <?php else: ?>
-                <div style="background: var(--glass-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--glass-border); overflow-x: auto;">
+                <div style="background: var(--glass-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--glass-border); overflow-x: auto; margin-top: 2rem;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="border-bottom: 1px solid var(--glass-border);">

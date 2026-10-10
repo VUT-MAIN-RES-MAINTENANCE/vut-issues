@@ -1,1 +1,20 @@
-[]
+[
+    {
+        "id": "issue_6ac9f657b35271f20c8c9",
+        "student_id": "student_6abf846b98c7019a9a70b",
+        "student_name": "Mavangwa",
+        "student_no": "224632132",
+        "residence": "Nkandla",
+        "block": "10",
+        "room": "F10",
+        "issue": "table",
+        "gender": "M",
+        "description": "TABLE IS BROKEN",
+        "image": "pictures\/issues\/issue_6ac9f657b2e9986f51f8e.png",
+        "status": "in_progress",
+        "assigned_to": null,
+        "maintenance_notes": "",
+        "created_at": "2026-10-10 10:24:55",
+        "updated_at": "2026-10-10 11:08:19"
+    }
+]

@@ -69,13 +69,7 @@ else if ($is_student) { $dashboard_url = 'student/index.php'; $dashboard_label =
                     </span>
                 </li>
                 <li>
-                    <?php
-                        $logout_target = '';
-                        if ($is_admin) $logout_target = 'admin/login.php?action=logout';
-                        else if ($is_staff) $logout_target = 'maintenance/login.php?action=logout';
-                        else if ($is_student) $logout_target = 'student/login.php?action=logout';
-                    ?>
-                    <a href="<?php echo htmlspecialchars($logout_target); ?>" class="nav-btn-text" id="nav-logout">
+                    <a href="student/login.php?action=logout" class="nav-btn-text" id="nav-logout">
                         <i class="fas fa-right-from-bracket"></i> Log Out
                     </a>
                 </li>

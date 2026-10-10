@@ -30,22 +30,18 @@ if (!$issue) {
     exit;
 }
 
-// Verify issue is assigned to this staff member
-if (!isset($issue['assigned_to']) || $issue['assigned_to'] != $user_id) {
-    header('Location: assigned-issues.php');
-    exit;
-}
+// All maintenance staff can view and update any issue
 
 $error = '';
 $success = '';
 
 // Handle status update
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_status') {
     $new_status = $_POST['status'] ?? '';
     $maintenance_notes = trim($_POST['maintenance_notes'] ?? '');
-    
+
     // Validate status
-    $valid_statuses = [STATUS_ASSIGNED, STATUS_IN_PROGRESS, STATUS_COMPLETED];
+    $valid_statuses = [STATUS_PENDING, STATUS_IN_PROGRESS, STATUS_COMPLETED];
     if (!in_array($new_status, $valid_statuses)) {
         $error = 'Invalid status.';
     } else {
@@ -54,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'maintenance_notes' => htmlspecialchars($maintenance_notes),
             'updated_at' => date('Y-m-d H:i:s')
         ];
-        
+
         if (json_update(MAINTENANCE_REQUESTS_FILE, $issue_id, $updates)) {
             $success = 'Issue updated successfully!';
             // Refresh issue data
@@ -125,7 +121,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                     <i class="fas fa-arrow-left"></i>
                     Back to Home
                 </a>
-                <a href="login.php?action=logout">
+                <a href="#" onclick="window.location.href='../student/login.php?action=logout';">
                     <i class="fas fa-sign-out-alt"></i>
                     Log Out
                 </a>
@@ -230,22 +226,22 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
 
             <div style="background: var(--glass-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--glass-border);">
                 <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Update Status</h3>
-                
                 <form method="POST" action="">
+                    <input type="hidden" name="action" value="update_status">
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Status</label>
                         <select name="status" required style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: white; font-size: 0.95rem;">
-                            <option value="<?php echo STATUS_ASSIGNED; ?>" <?php echo $issue['status'] === STATUS_ASSIGNED ? 'selected' : ''; ?>>Assigned</option>
+                            <option value="<?php echo STATUS_PENDING; ?>" <?php echo $issue['status'] === STATUS_PENDING ? 'selected' : ''; ?>>Pending</option>
                             <option value="<?php echo STATUS_IN_PROGRESS; ?>" <?php echo $issue['status'] === STATUS_IN_PROGRESS ? 'selected' : ''; ?>>In Progress</option>
                             <option value="<?php echo STATUS_COMPLETED; ?>" <?php echo $issue['status'] === STATUS_COMPLETED ? 'selected' : ''; ?>>Completed</option>
                         </select>
                     </div>
-                    
+
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Maintenance Notes</label>
                         <textarea name="maintenance_notes" placeholder="Add notes about the maintenance work..." style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: white; font-size: 0.95rem; min-height: 120px; resize: vertical;"><?php echo htmlspecialchars($issue['maintenance_notes'] ?? ''); ?></textarea>
                     </div>
-                    
+
                     <button type="submit" style="width: 100%; padding: 0.875rem; background: var(--accent-color); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Update Issue</button>
                 </form>
             </div>
