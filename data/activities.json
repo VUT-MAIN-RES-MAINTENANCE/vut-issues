@@ -556,5 +556,14 @@
         "description": "Staff logged in: John Maintenance",
         "related_issue": null,
         "timestamp": "2026-10-09 19:42:33"
+    },
+    {
+        "id": "activity_6ac9ed175940054b63fba",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-10 09:45:27"
     }
 ]

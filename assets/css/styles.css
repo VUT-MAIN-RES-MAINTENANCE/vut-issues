@@ -24,6 +24,251 @@ body.maintenance-light-mode .maintenance-sidebar {
     background: linear-gradient(180deg, #0d1b2a 0%, #1b3a4b 100%);
 }
 
+/* Student Layout */
+.student-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.student-sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #0d1b2a 0%, #1b3a4b 100%);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+}
+
+.student-sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.student-sidebar-header img {
+    width: 40px;
+    height: 40px;
+}
+
+.student-sidebar-header h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.student-sidebar-header span {
+    font-weight: 300;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.student-sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.student-sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.student-sidebar-nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.student-sidebar-nav a.active {
+    background: var(--accent-color);
+    color: white;
+}
+
+.student-sidebar-nav a i {
+    width: 20px;
+    text-align: center;
+}
+
+.student-sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.student-sidebar-footer a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.student-sidebar-footer a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.student-sidebar-footer a i {
+    width: 20px;
+    text-align: center;
+}
+
+.student-main {
+    flex: 1;
+    margin-left: 260px;
+    padding: 2rem;
+    padding-top: 7rem;
+    min-height: 100vh;
+}
+
+.student-header {
+    position: fixed;
+    top: 0;
+    left: 260px;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba(9, 10, 15, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 999;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 0;
+}
+
+.student-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.student-header p {
+    color: var(--text-muted);
+    margin: 0.25rem 0 0 0;
+}
+
+.student-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.student-user-info > div:first-child {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.student-user-info > div:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.student-user-info strong {
+    font-size: 0.95rem;
+}
+
+.student-user-info span {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Student light mode overrides */
+body.student-light-mode .student-sidebar {
+    background: linear-gradient(180deg, #0d1b2a 0%, #1b3a4b 100%);
+}
+
+body.student-light-mode .student-header {
+    background: rgba(9, 10, 15, 0.8);
+}
+
+/* Student sidebar mobile toggle */
+@media (max-width: 768px) {
+    .student-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .student-sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .student-main {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 5rem;
+    }
+    
+    .student-header {
+        left: 0;
+    }
+    
+    .student-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .student-header p {
+        font-size: 0.85rem;
+    }
+}
+
+/* Student sidebar toggle button */
+.sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    width: 40px;
+    height: 40px;
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background: var(--accent-hover);
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .sidebar-toggle {
+        display: flex;
+    }
+}
+
 * {
     margin: 0;
     padding: 0;
