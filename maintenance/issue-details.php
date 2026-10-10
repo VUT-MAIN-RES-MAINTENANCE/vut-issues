@@ -66,6 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+// Get user initials for avatar
+$user_initials = strtoupper(substr($user['name'], 0, 1));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -82,170 +85,193 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="home-page">
-    <nav class="navbar">
-        <input type="checkbox" id="nav-toggle" class="nav-toggle-input">
-        <div class="logo">
-            <img src="../assets/images/logo.png" alt="VUT Logo" class="nav-logo">
-            VUT MainRes<span>Maintenance</span>
-        </div>
-        <label for="nav-toggle" class="menu-toggle-btn">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </label>
-        <ul class="nav-links" id="nav-links">
-            <li><a href="../index.php">Home</a></li>
-            <li><a href="assigned-issues.php" class="nav-btn-text">Assigned Issues</a></li>
-            <li><a href="profile.php" class="nav-btn-text">Profile</a></li>
-            <li><a href="login.php?action=logout" class="nav-btn-primary">Log Out</a></li>
-        </ul>
-    </nav>
+<body>
+    <button class="sidebar-toggle" onclick="document.querySelector('.maintenance-sidebar').classList.toggle('open')">
+        <i class="fas fa-bars"></i>
+    </button>
 
-    <section class="page-container">
-        <h2 class="section-title">Issue Details</h2>
-        <p class="section-subtitle">View detailed information about a maintenance issue.</p>
-        
-        <?php if ($error): ?>
-            <div class="error-message" style="color: #ef4444; margin-bottom: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">
-                <?php echo htmlspecialchars($error); ?>
+    <div class="maintenance-layout">
+        <!-- Sidebar -->
+        <aside class="maintenance-sidebar">
+            <div class="maintenance-sidebar-header">
+                <img src="../assets/images/logo.png" alt="VUT Logo">
+                <div>
+                    <h2>VUT MainRes</h2>
+                    <span>Maintenance</span>
+                </div>
             </div>
-        <?php endif; ?>
-        
-        <?php if ($success): ?>
-            <div class="success-message" style="color: #22c55e; margin-bottom: 1rem; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-radius: 8px;">
-                <?php echo htmlspecialchars($success); ?>
+
+            <nav class="maintenance-sidebar-nav">
+                <a href="index.php">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+                <a href="assigned-issues.php">
+                    <i class="fas fa-clipboard-list"></i>
+                    Assigned Issues
+                </a>
+                <a href="profile.php">
+                    <i class="fas fa-user"></i>
+                    My Profile
+                </a>
+                <a href="settings.php">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+            </nav>
+
+            <div class="maintenance-sidebar-footer">
+                <a href="../index.php">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Home
+                </a>
+                <a href="login.php?action=logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Log Out
+                </a>
             </div>
-        <?php endif; ?>
-        
-        <div class="about-hero-banner" style="margin-bottom: 2rem;">
-            <h1>Maintenance Issue #<?php echo htmlspecialchars(substr($issue['id'], -8)); ?></h1>
-            <p>Issue reported by <?php echo htmlspecialchars($issue['student_name']); ?></p>
-        </div>
-        
-        <div class="form-container">
-            <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">Issue Information</h3>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-                    <div>
-                        <strong>Issue Type:</strong><br>
-                        <?php echo htmlspecialchars($issue['issue']); ?>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="maintenance-main">
+            <div class="maintenance-header">
+                <div>
+                    <h1>Issue Details</h1>
+                    <p>View detailed information about a maintenance issue.</p>
+                </div>
+                <div class="maintenance-user-info">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; color: white;">
+                        <?php echo $user_initials; ?>
                     </div>
                     <div>
-                        <strong>Status:</strong><br>
-                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; 
-                            <?php
-                            $status_colors = [
-                                STATUS_PENDING => 'background: #f59e0b; color: white;',
-                                STATUS_ASSIGNED => 'background: #3b82f6; color: white;',
-                                STATUS_IN_PROGRESS => 'background: #8b5cf6; color: white;',
-                                STATUS_COMPLETED => 'background: #22c55e; color: white;'
-                            ];
-                            echo $status_colors[$issue['status']] ?? 'background: #6b7280; color: white;';
-                            ?>">
-                            <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $issue['status']))); ?>
-                        </span>
-                    </div>
-                    <div>
-                        <strong>Residence:</strong><br>
-                        <?php echo htmlspecialchars($issue['residence']); ?>
-                    </div>
-                    <div>
-                        <strong>Block:</strong><br>
-                        <?php echo htmlspecialchars($issue['block']); ?>
-                    </div>
-                    <div>
-                        <strong>Room:</strong><br>
-                        <?php echo htmlspecialchars($issue['room']); ?>
-                    </div>
-                    <div>
-                        <strong>Gender:</strong><br>
-                        <?php echo htmlspecialchars($issue['gender']); ?>
-                    </div>
-                    <div>
-                        <strong>Student No:</strong><br>
-                        <?php echo htmlspecialchars($issue['student_no']); ?>
-                    </div>
-                    <div>
-                        <strong>Reported:</strong><br>
-                        <?php echo date('M d, Y H:i', strtotime($issue['created_at'])); ?>
+                        <strong><?php echo htmlspecialchars($user['name']); ?></strong>
+                        <span>Maintenance Staff</span>
                     </div>
                 </div>
-                
-                <?php if (!empty($issue['description'])): ?>
-                    <div style="margin-top: 1rem;">
-                        <strong>Description:</strong><br>
-                        <?php echo nl2br(htmlspecialchars($issue['description'])); ?>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (!empty($issue['image'])): ?>
-                    <div style="margin-top: 1rem;">
-                        <strong>Issue Picture:</strong><br>
-                        <img src="../<?php echo htmlspecialchars($issue['image']); ?>" alt="Issue picture" style="max-width: 300px; border-radius: 8px; margin-top: 0.5rem;">
-                    </div>
-                <?php endif; ?>
             </div>
+
+            <?php if ($error): ?>
+                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; color: #ef4444;">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
             
-            <form class="modern-form" method="POST" action="">
-                <h3 style="margin-bottom: 1rem;">Update Status</h3>
-                
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="status" required>
-                        <option value="<?php echo STATUS_ASSIGNED; ?>" <?php echo $issue['status'] === STATUS_ASSIGNED ? 'selected' : ''; ?>>Assigned</option>
-                        <option value="<?php echo STATUS_IN_PROGRESS; ?>" <?php echo $issue['status'] === STATUS_IN_PROGRESS ? 'selected' : ''; ?>>In Progress</option>
-                        <option value="<?php echo STATUS_COMPLETED; ?>" <?php echo $issue['status'] === STATUS_COMPLETED ? 'selected' : ''; ?>>Completed</option>
-                    </select>
+            <?php if ($success): ?>
+                <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; color: #22c55e;">
+                    <?php echo htmlspecialchars($success); ?>
                 </div>
-                
-                <div class="form-group">
-                    <label>Maintenance Notes</label>
-                    <textarea name="maintenance_notes" placeholder="Add notes about the maintenance work..."><?php echo htmlspecialchars($issue['maintenance_notes'] ?? ''); ?></textarea>
-                </div>
-                
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Update Issue</button>
-            </form>
-        </div>
-        
-        <div style="margin-top: 2rem;">
-            <a href="assigned-issues.php" class="btn" style="display: inline-block; padding: 0.6rem 1.2rem; background: rgba(255, 255, 255, 0.1); color: white; text-decoration: none; border-radius: 4px;">&larr; Back to Assigned Issues</a>
-        </div>
-    </section>
+            <?php endif; ?>
 
-    <footer class="footer">
-        <div class="footer-services">
-            <div class="footer-column">
-                <div class="footer-column-title">Our Services</div>
-                <p class="footer-column-text">We offer a wide range of premium maintenance services to keep your property in perfect condition.</p>
-            </div>
-            <div class="footer-column">
-                <div class="footer-column-title">Quick Navigation</div>
-                <a href="../index.php">Home</a>
-            </div>
-            <div class="footer-column">
-                <div class="footer-column-title">Connect with us</div>
-                <div class="social-icons">
-                    <a href="https://www.facebook.com/VUT.ac.za/" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://x.com/VUT_Science" target="_blank" rel="noopener"><i class="fab fa-x-twitter"></i></a>
-                    <a href="https://www.linkedin.com/school/vaal-university-of-technology/" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="https://www.instagram.com/vut_university/" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.tiktok.com/@vut_university" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i></a>
-                    <a href="https://www.youtube.com/user/VUTTV" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
+            <div style="background: var(--glass-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--glass-border); margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Maintenance Issue #<?php echo htmlspecialchars(substr($issue['id'], -8)); ?></h2>
+                        <p style="color: var(--text-muted);">Reported by <?php echo htmlspecialchars($issue['student_name']); ?></p>
+                    </div>
+                    <span style="padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; 
+                        <?php
+                        $status_colors = [
+                            STATUS_PENDING => 'background: rgba(245, 158, 11, 0.2); color: #f59e0b;',
+                            STATUS_ASSIGNED => 'background: rgba(59, 130, 246, 0.2); color: #3b82f6;',
+                            STATUS_IN_PROGRESS => 'background: rgba(139, 92, 246, 0.2); color: #8b5cf6;',
+                            STATUS_COMPLETED => 'background: rgba(34, 197, 94, 0.2); color: #22c55e;'
+                        ];
+                        echo $status_colors[$issue['status']] ?? 'background: rgba(107, 114, 128, 0.2); color: #6b7280;';
+                        ?>">
+                        <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $issue['status']))); ?>
+                    </span>
                 </div>
-                <div class="footer-column-title">Official Site</div>
-                <a href="https://vut.ac.za/" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Visit VUT Website</a>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">Issue Type</label>
+                        <div style="font-weight: 500;"><?php echo htmlspecialchars($issue['issue']); ?></div>
+                    </div>
+                    <div>
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">Residence</label>
+                        <div style="font-weight: 500;"><?php echo htmlspecialchars($issue['residence']); ?></div>
+                    </div>
+                    <div>
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">Block</label>
+                        <div style="font-weight: 500;"><?php echo htmlspecialchars($issue['block']); ?></div>
+                    </div>
+                    <div>
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">Room</label>
+                        <div style="font-weight: 500;"><?php echo htmlspecialchars($issue['room']); ?></div>
+                    </div>
+                    <div>
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">Gender</label>
+                        <div style="font-weight: 500;"><?php echo htmlspecialchars($issue['gender']); ?></div>
+                    </div>
+                    <div>
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">Student No</label>
+                        <div style="font-weight: 500;"><?php echo htmlspecialchars($issue['student_no']); ?></div>
+                    </div>
+                    <div>
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">Reported</label>
+                        <div style="font-weight: 500;"><?php echo date('M d, Y H:i', strtotime($issue['created_at'])); ?></div>
+                    </div>
+                </div>
+
+                <?php if (!empty($issue['description'])): ?>
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Description</label>
+                        <div style="line-height: 1.6;"><?php echo nl2br(htmlspecialchars($issue['description'])); ?></div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty($issue['image'])): ?>
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Issue Picture</label>
+                        <img src="../<?php echo htmlspecialchars($issue['image']); ?>" alt="Issue picture" style="max-width: 400px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                    </div>
+                <?php endif; ?>
             </div>
-        </div>
-        <div class="footer-content">
-            <div class="footer-brand">
-                <img src="../assets/images/logo.png" alt="MainRes Logo" class="footer-logo">
-                <p>&copy; 2026 MainRes Maintenance. All rights reserved.</p>
+
+            <div style="background: var(--glass-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--glass-border);">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Update Status</h3>
+                
+                <form method="POST" action="">
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Status</label>
+                        <select name="status" required style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: white; font-size: 0.95rem;">
+                            <option value="<?php echo STATUS_ASSIGNED; ?>" <?php echo $issue['status'] === STATUS_ASSIGNED ? 'selected' : ''; ?>>Assigned</option>
+                            <option value="<?php echo STATUS_IN_PROGRESS; ?>" <?php echo $issue['status'] === STATUS_IN_PROGRESS ? 'selected' : ''; ?>>In Progress</option>
+                            <option value="<?php echo STATUS_COMPLETED; ?>" <?php echo $issue['status'] === STATUS_COMPLETED ? 'selected' : ''; ?>>Completed</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Maintenance Notes</label>
+                        <textarea name="maintenance_notes" placeholder="Add notes about the maintenance work..." style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: white; font-size: 0.95rem; min-height: 120px; resize: vertical;"><?php echo htmlspecialchars($issue['maintenance_notes'] ?? ''); ?></textarea>
+                    </div>
+                    
+                    <button type="submit" style="width: 100%; padding: 0.875rem; background: var(--accent-color); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Update Issue</button>
+                </form>
             </div>
-            <div class="footer-links">
-                <a href="mailto:vut@mainresmaintenance.com" class="footer-link">vut@mainresmaintenance.com</a>
+
+            <div style="margin-top: 2rem;">
+                <a href="assigned-issues.php" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--glass-bg); color: white; text-decoration: none; border-radius: 8px; border: 1px solid var(--glass-border); transition: all 0.2s ease;">
+                    <i class="fas fa-arrow-left"></i> Back to Assigned Issues
+                </a>
             </div>
-        </div>
-    </footer>
+        </main>
+    </div>
+
+    <script>
+    function applyTheme(isLight) {
+        if (isLight) {
+            document.body.classList.add('maintenance-light-mode');
+        } else {
+            document.body.classList.remove('maintenance-light-mode');
+        }
+    }
+
+    (function loadTheme() {
+        const saved = localStorage.getItem('maintenanceTheme');
+        const isLight = saved === null ? true : saved === 'light';
+        applyTheme(isLight);
+    })();
+    </script>
 </body>
 </html>

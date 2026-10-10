@@ -529,5 +529,41 @@
         "description": "Admin logged in: Administrator",
         "related_issue": null,
         "timestamp": "2026-10-09 10:49:04"
+    },
+    {
+        "id": "activity_6ac8ab8e35b94f117ea09",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-09 10:53:34"
+    },
+    {
+        "id": "activity_6ac8aba4077d7eaae3b1b",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-09 10:53:56"
+    },
+    {
+        "id": "activity_6ac92789153aace8ae068",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-09 19:42:33"
+    },
+    {
+        "id": "activity_6ac9ed175940054b63fba",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-10 09:45:27"
     }
 ]
