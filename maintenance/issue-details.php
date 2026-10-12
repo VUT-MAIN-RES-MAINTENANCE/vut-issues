@@ -3,16 +3,18 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
-// Require login
 require_login('login.php');
+require_role(ROLE_STAFF, 'login.php');
 
 $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_STAFF);
 
 if (!$user) {
-    header('Location: login.php');
+    header('Location: ../student/login.php');
     exit;
 }
+
+$settings = json_read(SETTINGS_FILE);
 
 // Get issue ID from URL
 $issue_id = $_GET['id'] ?? '';
@@ -47,16 +49,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } else {
         $updates = [
             'status' => $new_status,
-            'maintenance_notes' => htmlspecialchars($maintenance_notes),
-            'updated_at' => date('Y-m-d H:i:s')
+            'maintenance_notes' => htmlspecialchars($maintenance_notes)
         ];
 
-        if (json_update(MAINTENANCE_REQUESTS_FILE, $issue_id, $updates)) {
+        $updated = update_maintenance_issue(
+            $issue_id,
+            $updates,
+            $user_id,
+            ROLE_STAFF,
+            'update_issue',
+            "Updated issue status to: $new_status" . ($maintenance_notes ? " with notes: $maintenance_notes" : "")
+        );
+
+        if ($updated) {
             $success = 'Issue updated successfully!';
             // Refresh issue data
-            $issue = json_find_by_id(MAINTENANCE_REQUESTS_FILE, $issue_id);
-            // Log activity
-            log_activity($user_id, ROLE_STAFF, 'update_issue', "Updated issue status to: $new_status", $issue_id);
+            $issue = get_issue_by_id($issue_id);
         } else {
             $error = 'Failed to update issue. Please try again.';
         }
@@ -255,18 +263,12 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
     </div>
 
     <script>
-    function applyTheme(isLight) {
-        if (isLight) {
+    // Theme Toggle Functionality
+    (function initTheme() {
+        const savedTheme = localStorage.getItem('maintenanceTheme');
+        if (savedTheme === 'light') {
             document.body.classList.add('maintenance-light-mode');
-        } else {
-            document.body.classList.remove('maintenance-light-mode');
         }
-    }
-
-    (function loadTheme() {
-        const saved = localStorage.getItem('maintenanceTheme');
-        const isLight = saved === null ? true : saved === 'light';
-        applyTheme(isLight);
     })();
     </script>
 </body>

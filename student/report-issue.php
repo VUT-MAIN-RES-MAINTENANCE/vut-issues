@@ -3,8 +3,8 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
-// Require login
 require_login('login.php');
+require_role(ROLE_STUDENT, 'login.php');
 
 $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_STUDENT);
@@ -13,6 +13,8 @@ if (!$user) {
     header('Location: login.php');
     exit;
 }
+
+$settings = json_read(SETTINGS_FILE);
 
 $error = '';
 $success = '';
@@ -91,30 +93,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             
-            // Create maintenance request
-            $request = [
-                'id' => generate_id('issue_'),
+            // Create maintenance request via central domain function
+            $request_data = [
                 'student_id' => $user_id,
                 'student_name' => $user['name'],
                 'student_no' => htmlspecialchars($student_no),
+                'email' => $user['email'] ?? '',
                 'residence' => htmlspecialchars($residence),
                 'block' => htmlspecialchars($block),
                 'room' => htmlspecialchars($room),
                 'issue' => htmlspecialchars($issue),
+                'category' => htmlspecialchars($issue),
+                'priority' => 'medium',
                 'gender' => htmlspecialchars($gender),
                 'description' => htmlspecialchars($description),
-                'image' => $image_path,
-                'status' => STATUS_PENDING,
-                'assigned_to' => null,
-                'maintenance_notes' => '',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'image' => $image_path
             ];
             
-            if (json_add(MAINTENANCE_REQUESTS_FILE, $request)) {
+            $created = create_maintenance_issue($request_data, $user_id);
+            if ($created) {
                 $reports_submitted++;
-                // Log activity
-                log_activity($user_id, ROLE_STUDENT, 'report_issue', "Reported issue: $issue", $request['id']);
             } else {
                 $error = "Failed to save Report $i.";
                 break;
@@ -252,7 +250,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                         <tbody>
                             <tr>
                                 <td class="label-col">Student NO</td>
-                                <td><input type="text" name="student_no" placeholder="Enter Student NO" required></td>
+                                <td><input type="text" name="student_no" placeholder="Enter Student NO" value="<?php echo htmlspecialchars($user['student_no'] ?? ''); ?>" required></td>
                                 <td class="report-col-2"><input type="text" name="student_no_2" placeholder="Enter Student NO"></td>
                                 <td class="report-col-3"><input type="text" name="student_no_3" placeholder="Enter Student NO"></td>
                             </tr>
@@ -260,13 +258,13 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                                 <td class="label-col">Residence</td>
                                 <td>
                                     <select name="residence" required>
-                                        <option value="" disabled selected>Select Residence</option>
-                                        <option value="Nkandla">Nkandla</option>
-                                        <option value="Malema">Malema</option>
-                                        <option value="Leseding">Leseding</option>
-                                        <option value="Khomanani">Khomanani</option>
-                                        <option value="Meropa">Meropa</option>
-                                        <option value="Khayelethu">Khayelethu</option>
+                                        <option value="" disabled>Select Residence</option>
+                                        <option value="Nkandla" <?php echo ($user['residence'] ?? '') === 'Nkandla' ? 'selected' : ''; ?>>Nkandla</option>
+                                        <option value="Malema" <?php echo ($user['residence'] ?? '') === 'Malema' ? 'selected' : ''; ?>>Malema</option>
+                                        <option value="Leseding" <?php echo ($user['residence'] ?? '') === 'Leseding' ? 'selected' : ''; ?>>Leseding</option>
+                                        <option value="Khomanani" <?php echo ($user['residence'] ?? '') === 'Khomanani' ? 'selected' : ''; ?>>Khomanani</option>
+                                        <option value="Meropa" <?php echo ($user['residence'] ?? '') === 'Meropa' ? 'selected' : ''; ?>>Meropa</option>
+                                        <option value="Khayelethu" <?php echo ($user['residence'] ?? '') === 'Khayelethu' ? 'selected' : ''; ?>>Khayelethu</option>
                                     </select>
                                 </td>
                                 <td class="report-col-2">
@@ -296,24 +294,24 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                                 <td class="label-col">Block NO</td>
                                 <td>
                                     <select name="block" required>
-                                        <option value="" disabled selected>Select Block</option>
+                                        <option value="" disabled>Select Block</option>
                                         <optgroup label="Nkandla">
-                                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                                            <option value="1" <?php echo ($user['block'] ?? '') === '1' ? 'selected' : ''; ?>>1</option><option value="2" <?php echo ($user['block'] ?? '') === '2' ? 'selected' : ''; ?>>2</option><option value="3" <?php echo ($user['block'] ?? '') === '3' ? 'selected' : ''; ?>>3</option><option value="4" <?php echo ($user['block'] ?? '') === '4' ? 'selected' : ''; ?>>4</option><option value="5" <?php echo ($user['block'] ?? '') === '5' ? 'selected' : ''; ?>>5</option><option value="6" <?php echo ($user['block'] ?? '') === '6' ? 'selected' : ''; ?>>6</option><option value="7" <?php echo ($user['block'] ?? '') === '7' ? 'selected' : ''; ?>>7</option><option value="8" <?php echo ($user['block'] ?? '') === '8' ? 'selected' : ''; ?>>8</option><option value="9" <?php echo ($user['block'] ?? '') === '9' ? 'selected' : ''; ?>>9</option><option value="10" <?php echo ($user['block'] ?? '') === '10' ? 'selected' : ''; ?>>10</option><option value="11" <?php echo ($user['block'] ?? '') === '11' ? 'selected' : ''; ?>>11</option><option value="12" <?php echo ($user['block'] ?? '') === '12' ? 'selected' : ''; ?>>12</option><option value="13" <?php echo ($user['block'] ?? '') === '13' ? 'selected' : ''; ?>>13</option><option value="14" <?php echo ($user['block'] ?? '') === '14' ? 'selected' : ''; ?>>14</option>
                                         </optgroup>
                                         <optgroup label="Malema">
-                                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option>
+                                            <option value="1" <?php echo ($user['block'] ?? '') === '1' ? 'selected' : ''; ?>>1</option><option value="2" <?php echo ($user['block'] ?? '') === '2' ? 'selected' : ''; ?>>2</option><option value="3" <?php echo ($user['block'] ?? '') === '3' ? 'selected' : ''; ?>>3</option><option value="4" <?php echo ($user['block'] ?? '') === '4' ? 'selected' : ''; ?>>4</option><option value="5" <?php echo ($user['block'] ?? '') === '5' ? 'selected' : ''; ?>>5</option><option value="6" <?php echo ($user['block'] ?? '') === '6' ? 'selected' : ''; ?>>6</option><option value="7" <?php echo ($user['block'] ?? '') === '7' ? 'selected' : ''; ?>>7</option><option value="8" <?php echo ($user['block'] ?? '') === '8' ? 'selected' : ''; ?>>8</option><option value="9" <?php echo ($user['block'] ?? '') === '9' ? 'selected' : ''; ?>>9</option><option value="10" <?php echo ($user['block'] ?? '') === '10' ? 'selected' : ''; ?>>10</option><option value="11" <?php echo ($user['block'] ?? '') === '11' ? 'selected' : ''; ?>>11</option><option value="12" <?php echo ($user['block'] ?? '') === '12' ? 'selected' : ''; ?>>12</option><option value="13" <?php echo ($user['block'] ?? '') === '13' ? 'selected' : ''; ?>>13</option><option value="14" <?php echo ($user['block'] ?? '') === '14' ? 'selected' : ''; ?>>14</option><option value="15" <?php echo ($user['block'] ?? '') === '15' ? 'selected' : ''; ?>>15</option>
                                         </optgroup>
                                         <optgroup label="Leseding">
-                                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                                            <option value="A" <?php echo ($user['block'] ?? '') === 'A' ? 'selected' : ''; ?>>A</option><option value="B" <?php echo ($user['block'] ?? '') === 'B' ? 'selected' : ''; ?>>B</option><option value="C" <?php echo ($user['block'] ?? '') === 'C' ? 'selected' : ''; ?>>C</option><option value="D" <?php echo ($user['block'] ?? '') === 'D' ? 'selected' : ''; ?>>D</option><option value="E" <?php echo ($user['block'] ?? '') === 'E' ? 'selected' : ''; ?>>E</option><option value="F" <?php echo ($user['block'] ?? '') === 'F' ? 'selected' : ''; ?>>F</option>
                                         </optgroup>
                                         <optgroup label="Meropa">
-                                            <option value="A">A</option><option value="B">B</option>
+                                            <option value="A" <?php echo ($user['block'] ?? '') === 'A' ? 'selected' : ''; ?>>A</option><option value="B" <?php echo ($user['block'] ?? '') === 'B' ? 'selected' : ''; ?>>B</option>
                                         </optgroup>
                                         <optgroup label="Khomanani">
-                                            <option value="Main">Main</option>
+                                            <option value="Main" <?php echo ($user['block'] ?? '') === 'Main' ? 'selected' : ''; ?>>Main</option>
                                         </optgroup>
                                         <optgroup label="Khayelethu">
-                                            <option value="Main">Main</option>
+                                            <option value="Main" <?php echo ($user['block'] ?? '') === 'Main' ? 'selected' : ''; ?>>Main</option>
                                         </optgroup>
                                     </select>
                                 </td>
@@ -368,15 +366,15 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                                 <td class="label-col">Room NO</td>
                                 <td>
                                     <select name="room" required>
-                                        <option value="" disabled selected>Select Room</option>
+                                        <option value="" disabled>Select Room</option>
                                         <optgroup label="Ground Floor">
-                                            <option value="G1">G1</option><option value="G2">G2</option><option value="G3">G3</option><option value="G4">G4</option><option value="G5">G5</option><option value="G6">G6</option><option value="G7">G7</option><option value="G8">G8</option><option value="G9">G9</option><option value="G10">G10</option><option value="G11">G11</option><option value="G12">G12</option>
+                                            <option value="G1" <?php echo ($user['room'] ?? '') === 'G1' ? 'selected' : ''; ?>>G1</option><option value="G2" <?php echo ($user['room'] ?? '') === 'G2' ? 'selected' : ''; ?>>G2</option><option value="G3" <?php echo ($user['room'] ?? '') === 'G3' ? 'selected' : ''; ?>>G3</option><option value="G4" <?php echo ($user['room'] ?? '') === 'G4' ? 'selected' : ''; ?>>G4</option><option value="G5" <?php echo ($user['room'] ?? '') === 'G5' ? 'selected' : ''; ?>>G5</option><option value="G6" <?php echo ($user['room'] ?? '') === 'G6' ? 'selected' : ''; ?>>G6</option><option value="G7" <?php echo ($user['room'] ?? '') === 'G7' ? 'selected' : ''; ?>>G7</option><option value="G8" <?php echo ($user['room'] ?? '') === 'G8' ? 'selected' : ''; ?>>G8</option><option value="G9" <?php echo ($user['room'] ?? '') === 'G9' ? 'selected' : ''; ?>>G9</option><option value="G10" <?php echo ($user['room'] ?? '') === 'G10' ? 'selected' : ''; ?>>G10</option><option value="G11" <?php echo ($user['room'] ?? '') === 'G11' ? 'selected' : ''; ?>>G11</option><option value="G12" <?php echo ($user['room'] ?? '') === 'G12' ? 'selected' : ''; ?>>G12</option>
                                         </optgroup>
                                         <optgroup label="First Floor">
-                                            <option value="F1">F1</option><option value="F2">F2</option><option value="F3">F3</option><option value="F4">F4</option><option value="F5">F5</option><option value="F6">F6</option><option value="F7">F7</option><option value="F8">F8</option><option value="F9">F9</option><option value="F10">F10</option><option value="F11">F11</option><option value="F12">F12</option>
+                                            <option value="F1" <?php echo ($user['room'] ?? '') === 'F1' ? 'selected' : ''; ?>>F1</option><option value="F2" <?php echo ($user['room'] ?? '') === 'F2' ? 'selected' : ''; ?>>F2</option><option value="F3" <?php echo ($user['room'] ?? '') === 'F3' ? 'selected' : ''; ?>>F3</option><option value="F4" <?php echo ($user['room'] ?? '') === 'F4' ? 'selected' : ''; ?>>F4</option><option value="F5" <?php echo ($user['room'] ?? '') === 'F5' ? 'selected' : ''; ?>>F5</option><option value="F6" <?php echo ($user['room'] ?? '') === 'F6' ? 'selected' : ''; ?>>F6</option><option value="F7" <?php echo ($user['room'] ?? '') === 'F7' ? 'selected' : ''; ?>>F7</option><option value="F8" <?php echo ($user['room'] ?? '') === 'F8' ? 'selected' : ''; ?>>F8</option><option value="F9" <?php echo ($user['room'] ?? '') === 'F9' ? 'selected' : ''; ?>>F9</option><option value="F10" <?php echo ($user['room'] ?? '') === 'F10' ? 'selected' : ''; ?>>F10</option><option value="F11" <?php echo ($user['room'] ?? '') === 'F11' ? 'selected' : ''; ?>>F11</option><option value="F12" <?php echo ($user['room'] ?? '') === 'F12' ? 'selected' : ''; ?>>F12</option>
                                         </optgroup>
                                         <optgroup label="Second Floor">
-                                            <option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option><option value="S7">S7</option><option value="S8">S8</option><option value="S9">S9</option><option value="S10">S10</option><option value="S11">S11</option><option value="S12">S12</option>
+                                            <option value="S1" <?php echo ($user['room'] ?? '') === 'S1' ? 'selected' : ''; ?>>S1</option><option value="S2" <?php echo ($user['room'] ?? '') === 'S2' ? 'selected' : ''; ?>>S2</option><option value="S3" <?php echo ($user['room'] ?? '') === 'S3' ? 'selected' : ''; ?>>S3</option><option value="S4" <?php echo ($user['room'] ?? '') === 'S4' ? 'selected' : ''; ?>>S4</option><option value="S5" <?php echo ($user['room'] ?? '') === 'S5' ? 'selected' : ''; ?>>S5</option><option value="S6" <?php echo ($user['room'] ?? '') === 'S6' ? 'selected' : ''; ?>>S6</option><option value="S7" <?php echo ($user['room'] ?? '') === 'S7' ? 'selected' : ''; ?>>S7</option><option value="S8" <?php echo ($user['room'] ?? '') === 'S8' ? 'selected' : ''; ?>>S8</option><option value="S9" <?php echo ($user['room'] ?? '') === 'S9' ? 'selected' : ''; ?>>S9</option><option value="S10" <?php echo ($user['room'] ?? '') === 'S10' ? 'selected' : ''; ?>>S10</option><option value="S11" <?php echo ($user['room'] ?? '') === 'S11' ? 'selected' : ''; ?>>S11</option><option value="S12" <?php echo ($user['room'] ?? '') === 'S12' ? 'selected' : ''; ?>>S12</option>
                                         </optgroup>
                                     </select>
                                 </td>
@@ -507,18 +505,12 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
     </div>
 
     <script>
-    function applyTheme(isLight) {
-        if (isLight) {
+    // Theme Toggle Functionality
+    (function initTheme() {
+        const savedTheme = localStorage.getItem('studentTheme');
+        if (savedTheme === 'light') {
             document.body.classList.add('student-light-mode');
-        } else {
-            document.body.classList.remove('student-light-mode');
         }
-    }
-
-    (function loadTheme() {
-        const saved = localStorage.getItem('studentTheme');
-        const isLight = saved === null ? true : saved === 'light';
-        applyTheme(isLight);
     })();
     </script>
 </body>

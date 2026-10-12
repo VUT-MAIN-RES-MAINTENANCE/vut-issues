@@ -4,6 +4,7 @@ require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
 require_login('login.php');
+require_role(ROLE_STUDENT, 'login.php');
 
 $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_STUDENT);
@@ -13,11 +14,14 @@ if (!$user) {
     exit;
 }
 
+$settings = json_read(SETTINGS_FILE);
+
 $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
+    $student_no = trim($_POST['student_no'] ?? '');
     $residence = $_POST['residence'] ?? '';
     $block = trim($_POST['block'] ?? '');
     $room = trim($_POST['room'] ?? '');
@@ -28,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $updates = [
             'name' => htmlspecialchars($name),
+            'student_no' => htmlspecialchars($student_no),
             'residence' => htmlspecialchars($residence),
             'block' => htmlspecialchars($block),
             'room' => htmlspecialchars($room),
@@ -37,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (json_update(STUDENTS_FILE, $user['id'], $updates)) {
             $success = 'Profile updated successfully!';
+            $_SESSION[SESSION_USER_NAME] = $updates['name'];
             $user = array_merge($user, $updates);
         } else {
             $error = 'Failed to update profile. Please try again.';
@@ -152,7 +158,12 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                             <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Name</label>
                             <input type="text" name="name" value="<?php echo htmlspecialchars($user['name'] ?? ''); ?>" required style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: white; font-size: 0.95rem;">
                         </div>
-                        
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Student Number</label>
+                            <input type="text" name="student_no" value="<?php echo htmlspecialchars($user['student_no'] ?? ''); ?>" placeholder="Enter your student number" style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: white; font-size: 0.95rem;">
+                        </div>
+
                         <div style="margin-bottom: 1.5rem;">
                             <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Email</label>
                             <input type="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" disabled style="width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-muted); font-size: 0.95rem; cursor: not-allowed;">
@@ -217,18 +228,12 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
     </div>
 
     <script>
-    function applyTheme(isLight) {
-        if (isLight) {
+    // Theme Toggle Functionality
+    (function initTheme() {
+        const savedTheme = localStorage.getItem('studentTheme');
+        if (savedTheme === 'light') {
             document.body.classList.add('student-light-mode');
-        } else {
-            document.body.classList.remove('student-light-mode');
         }
-    }
-
-    (function loadTheme() {
-        const saved = localStorage.getItem('studentTheme');
-        const isLight = saved === null ? true : saved === 'light';
-        applyTheme(isLight);
     })();
     </script>
 </body>

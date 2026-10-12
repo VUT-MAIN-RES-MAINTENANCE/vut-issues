@@ -3,16 +3,18 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
-// Require login
 require_login('login.php');
+require_role(ROLE_STAFF, 'login.php');
 
 $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_STAFF);
 
 if (!$user) {
-    header('Location: login.php');
+    header('Location: ../student/login.php');
     exit;
 }
+
+$settings = json_read(SETTINGS_FILE);
 
 $error = '';
 $success = '';
@@ -35,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (json_update(STAFF_FILE, $user_id, $updates)) {
             $success = 'Profile updated successfully!';
+            $_SESSION[SESSION_USER_NAME] = $updates['name'];
             // Refresh user data
             $user = get_user_by_id($user_id, ROLE_STAFF);
             // Log activity
@@ -189,18 +192,12 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
     </div>
 
     <script>
-    function applyTheme(isLight) {
-        if (isLight) {
+    // Theme Toggle Functionality
+    (function initTheme() {
+        const savedTheme = localStorage.getItem('maintenanceTheme');
+        if (savedTheme === 'light') {
             document.body.classList.add('maintenance-light-mode');
-        } else {
-            document.body.classList.remove('maintenance-light-mode');
         }
-    }
-
-    (function loadTheme() {
-        const saved = localStorage.getItem('maintenanceTheme');
-        const isLight = saved === null ? true : saved === 'light';
-        applyTheme(isLight);
     })();
     </script>
 </body>

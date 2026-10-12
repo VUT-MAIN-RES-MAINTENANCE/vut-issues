@@ -58,12 +58,30 @@ function has_role($role) {
 }
 
 /**
+ * Get the appropriate login URL based on current working directory
+ * @param string $login_url Optional custom URL
+ * @return string Resolved login URL
+ */
+function get_login_url($login_url = 'login.php') {
+    if (!empty($login_url) && $login_url !== 'login.php') {
+        return $login_url;
+    }
+    if (file_exists('login.php')) {
+        return 'login.php';
+    }
+    if (file_exists('../student/login.php')) {
+        return '../student/login.php';
+    }
+    return 'login.php';
+}
+
+/**
  * Require user to be logged in, redirect to login if not
  * @param string $login_url URL to redirect to if not logged in
  */
-function require_login($login_url) {
+function require_login($login_url = 'login.php') {
     if (!is_logged_in()) {
-        header('Location: ' . $login_url);
+        header('Location: ' . get_login_url($login_url));
         exit;
     }
 }
@@ -73,10 +91,10 @@ function require_login($login_url) {
  * @param string $role Required role
  * @param string $redirect_url URL to redirect to if role doesn't match
  */
-function require_role($role, $redirect_url) {
+function require_role($role, $redirect_url = 'login.php') {
     require_login($redirect_url);
     if (!has_role($role)) {
-        header('Location: ' . $redirect_url);
+        header('Location: ' . get_login_url($redirect_url));
         exit;
     }
 }

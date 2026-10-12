@@ -75,3 +75,7 @@ define('STATUS_COMPLETED', 'completed');
 define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/jpg']);
 define('MAX_IMAGE_SIZE', 5 * 1024 * 1024); // 5MB
 
+// Load foundational helper functions
+require_once __DIR__ . '/json.php';
+require_once __DIR__ . '/functions.php';
+

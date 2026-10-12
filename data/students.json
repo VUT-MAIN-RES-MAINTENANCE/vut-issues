@@ -7,9 +7,10 @@
         "role": "student",
         "phone": "0717758089",
         "created_at": "2026-10-02 10:16:12",
-        "updated_at": "2026-10-10 10:24:01",
+        "updated_at": "2026-10-12 16:02:24",
         "residence": "Nkandla",
         "room": "F10",
-        "block": "10"
+        "block": "10",
+        "student_no": "224632132"
     }
 ]
