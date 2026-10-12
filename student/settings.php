@@ -17,6 +17,8 @@ if (!$user) {
 $error = '';
 $success = '';
 
+$settings = json_read(SETTINGS_FILE);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     $current_password = $_POST['current_password'] ?? '';
     $new_password = $_POST['new_password'] ?? '';
@@ -165,9 +167,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                             <p>Choose your preferred display language.</p>
                         </div>
                         <select class="form-control" style="width: 220px;" onchange="changeLanguage(this.value)">
-                            <option value="en" <?php echo (!isset($_COOKIE['lang']) || $_COOKIE['lang'] === 'en') ? 'selected' : ''; ?>
-                                <i class="fas fa-flag-usa"></i> English
-                            </option>
+                            <option value="en" <?php echo (!isset($_COOKIE['lang']) || $_COOKIE['lang'] === 'en') ? 'selected' : ''; ?>>English</option>
                             <option value="ts" <?php echo (isset($_COOKIE['lang']) && $_COOKIE['lang'] === 'ts') ? 'selected' : ''; ?>>Xitsonga</option>
                             <option value="zu" <?php echo (isset($_COOKIE['lang']) && $_COOKIE['lang'] === 'zu') ? 'selected' : ''; ?>>isiZulu</option>
                         </select>
@@ -184,9 +184,9 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                             <label>Light Mode</label>
                             <p>Toggle between dark (default) and light interface theme.</p>
                         </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
-                            <span class="toggle-slider"></span>
+                        <label class="theme-toggle">
+                            <input type="checkbox" id="themeToggle">
+                            <span class="theme-toggle-slider"></span>
                         </label>
                     </div>
                 </div>
@@ -217,18 +217,6 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                         <button class="btn btn-danger" onclick="if(confirm('Sign out of student panel?')) window.location.href='login.php?action=logout';">
                             <i class="fas fa-right-from-bracket"></i> Sign Out
                         </button>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-top: 1.75rem; padding: 1.25rem 1.5rem; border-radius: var(--admin-radius-lg); background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(212, 175, 55, 0.06) 100%); border: 1px solid rgba(6, 182, 212, 0.15); display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(212, 175, 55, 0.18)); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="fas fa-circle-info" style="font-size: 1.25rem; color: var(--accent-color);"></i>
-                </div>
-                <div>
-                    <div style="font-weight: 700; color: var(--text-primary);">System Status: <span style="color: #22c55e;"><i class="fas fa-circle" style="font-size: 0.5rem; margin-right: 4px; animation: pulse 2s infinite;"></i>Operational</span></div>
-                    <div style="font-size: 0.825rem; color: var(--text-muted); margin-top: 2px;">
-                        Settings last updated: <?php echo isset($settings['updated_at']) ? date('M d, Y @ H:i', strtotime($settings['updated_at'])) : 'Never'; ?>
                     </div>
                 </div>
             </div>
@@ -302,53 +290,35 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         showToast('Language preference saved', 'success');
     }
 
-    function applyTheme(isLight) {
-        const root = document.documentElement;
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    
+    function setLightMode(isLight) {
+        const body = document.body;
+        
         if (isLight) {
-            root.style.setProperty('--bg-primary', '#f5f7fb');
-            root.style.setProperty('--bg-secondary', '#ffffff');
-            root.style.setProperty('--bg-tertiary', '#eef2f7');
-            root.style.setProperty('--sidebar-bg', 'rgba(255, 255, 255, 0.92)');
-            root.style.setProperty('--topbar-bg', 'rgba(255, 255, 255, 0.95)');
-            root.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.8)');
-            root.style.setProperty('--glass-border', 'rgba(15, 23, 42, 0.1)');
-            root.style.setProperty('--glass-highlight', 'rgba(15, 23, 42, 0.04)');
-            root.style.setProperty('--text-primary', '#0f172a');
-            root.style.setProperty('--text-secondary', '#334155');
-            root.style.setProperty('--text-muted', '#64748b');
-            root.style.setProperty('--text-dim', '#94a3b8');
-            document.body.classList.add('student-light-mode');
+            body.classList.add('student-light-mode');
+            localStorage.setItem('studentTheme', 'light');
         } else {
-            root.style.removeProperty('--bg-primary');
-            root.style.removeProperty('--bg-secondary');
-            root.style.removeProperty('--bg-tertiary');
-            root.style.removeProperty('--sidebar-bg');
-            root.style.removeProperty('--topbar-bg');
-            root.style.removeProperty('--glass-bg');
-            root.style.removeProperty('--glass-border');
-            root.style.removeProperty('--glass-highlight');
-            root.style.removeProperty('--text-primary');
-            root.style.removeProperty('--text-secondary');
-            root.style.removeProperty('--text-muted');
-            root.style.removeProperty('--text-dim');
-            document.body.classList.remove('student-light-mode');
+            body.classList.remove('student-light-mode');
+            localStorage.setItem('studentTheme', 'dark');
         }
     }
-
-    function toggleTheme() {
-        const isLight = document.getElementById('themeToggle').checked;
-        localStorage.setItem('studentTheme', isLight ? 'light' : 'dark');
-        applyTheme(isLight);
-        showToast(isLight ? 'Switched to Light Mode' : 'Switched to Dark Mode', 'success');
-    }
-
-    (function loadPrefs() {
-        const saved = localStorage.getItem('studentTheme');
-        const isLight = saved === 'light';
-        const toggle = document.getElementById('themeToggle');
-        if (toggle) toggle.checked = isLight;
-        applyTheme(isLight);
+    
+    // Initialize theme from localStorage
+    (function initTheme() {
+        const savedTheme = localStorage.getItem('studentTheme');
+        if (savedTheme === 'light') {
+            themeToggle.checked = true;
+            setLightMode(true);
+        }
     })();
+    
+    // Handle toggle change
+    themeToggle.addEventListener('change', function() {
+        setLightMode(this.checked);
+        showToast(this.checked ? 'Light mode enabled' : 'Dark mode enabled', 'success');
+    });
 
     function showToast(message, type = 'success') {
         const existing = document.querySelector('.toast');

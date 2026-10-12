@@ -10,12 +10,33 @@ $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_ADMIN);
 
 if (!$user) {
-    header('Location: login.php');
+    header('Location: ../student/login.php');
     exit;
 }
 
 $error = '';
 $success = '';
+
+// Handle appearance theme update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_theme'])) {
+    $theme = $_POST['theme'] ?? 'dark';
+    $settings = json_read(SETTINGS_FILE);
+    
+    if (!isset($settings['appearance'])) {
+        $settings['appearance'] = [];
+    }
+    
+    $settings['appearance']['theme'] = $theme;
+    $settings['appearance']['updated_at'] = date('Y-m-d H:i:s');
+    $settings['updated_at'] = date('Y-m-d H:i:s');
+    
+    if (json_write(SETTINGS_FILE, $settings)) {
+        $success = 'Theme updated successfully!';
+        log_activity($user_id, ROLE_ADMIN, 'update_theme', "Updated theme to: $theme");
+    } else {
+        $error = 'Failed to update theme. Please try again.';
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     $current_password = $_POST['current_password'] ?? '';
@@ -83,7 +104,7 @@ $display_email = $user['email'] ?? '';
                 <li><a href="issues.php"><i class="fas fa-clipboard-list"></i> Issues</a></li>
                 <li><a href="settings.php" class="active"><i class="fas fa-cog"></i> Settings</a></li>
                 <li>
-                    <a href="../student/login.php?action=logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <a href="#" onclick="window.location.href='../student/login.php?action=logout';"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </li>
             </ul>
         </aside>
@@ -130,9 +151,7 @@ $display_email = $user['email'] ?? '';
                             <p>Choose your preferred display language.</p>
                         </div>
                         <select class="form-control" style="width: 220px;" onchange="changeLanguage(this.value)">
-                            <option value="en" <?php echo (!isset($_COOKIE['lang']) || $_COOKIE['lang'] === 'en') ? 'selected' : ''; ?>>
-                                <i class="fas fa-flag-usa"></i> English
-                            </option>
+                            <option value="en" <?php echo (!isset($_COOKIE['lang']) || $_COOKIE['lang'] === 'en') ? 'selected' : ''; ?>>English</option>
                             <option value="ts" <?php echo (isset($_COOKIE['lang']) && $_COOKIE['lang'] === 'ts') ? 'selected' : ''; ?>>Xitsonga</option>
                             <option value="zu" <?php echo (isset($_COOKIE['lang']) && $_COOKIE['lang'] === 'zu') ? 'selected' : ''; ?>>isiZulu</option>
                         </select>
@@ -147,10 +166,10 @@ $display_email = $user['email'] ?? '';
                     <div class="settings-item">
                         <div class="settings-item-info">
                             <label>Light Mode</label>
-                            <p>Toggle between dark (default) and light interface theme.</p>
+                            <p>Toggle between dark (default) and light interface theme. This applies to all dashboards.</p>
                         </div>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+                            <input type="checkbox" id="themeToggle" onchange="toggleTheme()" <?php echo (isset($settings['appearance']['theme']) && $settings['appearance']['theme'] === 'light') ? 'checked' : ''; ?>>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -170,7 +189,7 @@ $display_email = $user['email'] ?? '';
                             <i class="fas fa-key"></i> Change Password
                         </button>
                     </div>
-                    <div class="settings-item" style="border-top: 1px solid var(--admin-glass-border); margin-top: 0.5rem; padding-top: 1.25rem;">
+                    <div class="settings-item">
                         <div class="settings-item-info">
                             <label>Current Session</label>
                             <p>
@@ -179,9 +198,6 @@ $display_email = $user['email'] ?? '';
                                 <span style="font-size: 0.78rem;">Role: System Administrator</span>
                             </p>
                         </div>
-                        <button class="btn btn-danger" onclick="if(confirm('Sign out of admin panel?')) window.location.href='../student/login.php?action=logout';">
-                            <i class="fas fa-right-from-bracket"></i> Sign Out
-                        </button>
                     </div>
                 </div>
             </div>
@@ -269,7 +285,12 @@ $display_email = $user['email'] ?? '';
 
     function applyTheme(isLight) {
         const root = document.documentElement;
+        const body = document.body;
+        
+        console.log('Applying theme, isLight:', isLight);
+        
         if (isLight) {
+            // Set CSS variables for light mode
             root.style.setProperty('--admin-bg-primary', '#f5f7fb');
             root.style.setProperty('--admin-bg-secondary', '#ffffff');
             root.style.setProperty('--admin-bg-tertiary', '#eef2f7');
@@ -282,8 +303,10 @@ $display_email = $user['email'] ?? '';
             root.style.setProperty('--admin-text-secondary', '#334155');
             root.style.setProperty('--admin-text-muted', '#64748b');
             root.style.setProperty('--admin-text-dim', '#94a3b8');
-            document.body.classList.add('admin-light-mode');
+            body.classList.add('admin-light-mode');
+            console.log('Light mode applied');
         } else {
+            // Remove CSS variables to revert to dark mode
             root.style.removeProperty('--admin-bg-primary');
             root.style.removeProperty('--admin-bg-secondary');
             root.style.removeProperty('--admin-bg-tertiary');
@@ -296,22 +319,46 @@ $display_email = $user['email'] ?? '';
             root.style.removeProperty('--admin-text-secondary');
             root.style.removeProperty('--admin-text-muted');
             root.style.removeProperty('--admin-text-dim');
-            document.body.classList.remove('admin-light-mode');
+            body.classList.remove('admin-light-mode');
+            console.log('Dark mode applied');
         }
     }
 
     function toggleTheme() {
-        const isLight = document.getElementById('themeToggle').checked;
-        localStorage.setItem('adminTheme', isLight ? 'light' : 'dark');
+        const toggle = document.getElementById('themeToggle');
+        const isLight = toggle.checked;
+        const theme = isLight ? 'light' : 'dark';
+        
+        // Apply theme immediately for instant feedback
         applyTheme(isLight);
-        showToast(isLight ? 'Switched to Light Mode' : 'Switched to Dark Mode', 'success');
+        
+        // Save to server via AJAX
+        fetch('settings.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'update_theme=1&theme=' + theme
+        }).then(response => response.text()).then(text => {
+            console.log('Server response:', text);
+            localStorage.setItem('adminTheme', theme);
+            showToast(isLight ? 'Switched to Light Mode' : 'Switched to Dark Mode', 'success');
+        }).catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to update theme', 'error');
+            // Revert toggle if save failed
+            toggle.checked = !isLight;
+            applyTheme(!isLight);
+        });
     }
 
     (function loadPrefs() {
         const saved = localStorage.getItem('adminTheme');
-        const isLight = saved === 'light';
+        const serverTheme = <?php echo json_encode($settings['appearance']['theme'] ?? 'dark'); ?>;
+        const isLight = serverTheme === 'light';
         const toggle = document.getElementById('themeToggle');
         if (toggle) toggle.checked = isLight;
+        localStorage.setItem('adminTheme', serverTheme);
         applyTheme(isLight);
     })();
 

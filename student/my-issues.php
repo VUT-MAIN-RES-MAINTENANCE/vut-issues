@@ -3,8 +3,8 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
-// Require login
 require_login('login.php');
+require_role(ROLE_STUDENT, 'login.php');
 
 $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_STUDENT);
@@ -14,18 +14,11 @@ if (!$user) {
     exit;
 }
 
-// Get all maintenance requests
-$all_requests = json_read(MAINTENANCE_REQUESTS_FILE);
+$settings = json_read(SETTINGS_FILE);
 
-// Filter to show only this student's issues
-$my_issues = array_filter($all_requests, function($request) use ($user_id) {
-    return isset($request['student_id']) && $request['student_id'] == $user_id;
-});
-
-// Sort by created date (newest first)
-usort($my_issues, function($a, $b) {
-    return strtotime($b['created_at']) - strtotime($a['created_at']);
-});
+// Get all issues for this student using unified domain helper
+$my_issues = get_student_issues($user_id);
+$staff_lookup = get_staff_lookup();
 
 // Get user initials for avatar
 $user_initials = strtoupper(substr($user['name'], 0, 1));
@@ -33,12 +26,12 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
 // Helper function for status badge
 function getStatusBadge($status) {
     $badges = [
-        STATUS_PENDING => '<span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Pending</span>',
-        STATUS_ASSIGNED => '<span style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Assigned</span>',
-        STATUS_IN_PROGRESS => '<span style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">In Progress</span>',
-        STATUS_COMPLETED => '<span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Fixed</span>'
+        STATUS_PENDING => '<span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">Pending</span>',
+        STATUS_ASSIGNED => '<span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">Assigned</span>',
+        STATUS_IN_PROGRESS => '<span style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6; padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">In Progress</span>',
+        STATUS_COMPLETED => '<span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">Fixed</span>'
     ];
-    return $badges[$status] ?? $status;
+    return $badges[$status] ?? '<span style="background: rgba(107, 114, 128, 0.2); color: #6b7280; padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">' . htmlspecialchars((string)$status) . '</span>';
 }
 ?>
 <!DOCTYPE html>
@@ -115,7 +108,7 @@ function getStatusBadge($status) {
                         <?php echo date('l, F j, Y'); ?> · <?php echo date('g:i A'); ?>
                     </div>
                     <h1>My Issues</h1>
-                    <p>View and track your reported maintenance issues.</p>
+                    <p>View, track, and monitor real-time updates for your reported maintenance issues.</p>
                 </div>
                 <div class="student-user-info">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; color: white;">
@@ -140,25 +133,49 @@ function getStatusBadge($status) {
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="border-bottom: 1px solid var(--glass-border);">
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text-muted);">Issue</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text-muted);">Issue Details</th>
                                 <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text-muted);">Location</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text-muted);">Assigned Staff</th>
                                 <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text-muted);">Status</th>
-                                <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text-muted);">Date</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text-muted);">Reported</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="issues-table-body" data-sync-container="issues">
                             <?php foreach ($my_issues as $issue): ?>
-                                <tr style="border-bottom: 1px solid var(--glass-border);">
+                                <tr data-issue-id="<?php echo htmlspecialchars($issue['id']); ?>" style="border-bottom: 1px solid var(--glass-border); transition: background 0.2s ease;">
                                     <td style="padding: 1rem;">
-                                        <div style="font-weight: 500; margin-bottom: 0.25rem;"><?php echo htmlspecialchars($issue['issue']); ?></div>
-                                        <div style="font-size: 0.85rem; color: var(--text-muted);"><?php echo htmlspecialchars($issue['description'] ?? 'No description'); ?></div>
+                                        <div style="font-weight: 600; margin-bottom: 0.25rem; font-size: 0.95rem;"><?php echo htmlspecialchars($issue['issue']); ?></div>
+                                        <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;"><?php echo htmlspecialchars($issue['description'] ?? 'No description'); ?></div>
+                                        <div data-field="notes">
+                                            <?php if (!empty($issue['maintenance_notes'])): ?>
+                                                <div style="background: rgba(34, 197, 94, 0.1); border-left: 3px solid #22c55e; padding: 0.4rem 0.6rem; border-radius: 4px; font-size: 0.8rem; color: #86efac; margin-top: 0.4rem;">
+                                                    <strong>Resolution:</strong> <?php echo htmlspecialchars($issue['maintenance_notes']); ?>
+                                                </div>
+                                            <?php else: ?>
+                                                <span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic; display: inline-block; margin-top: 0.25rem;">No staff notes yet</span>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
                                     <td style="padding: 1rem;">
-                                        <div><?php echo htmlspecialchars($issue['residence']); ?></div>
+                                        <div style="font-weight: 500;"><?php echo htmlspecialchars($issue['residence']); ?></div>
                                         <div style="font-size: 0.85rem; color: var(--text-muted);">Block <?php echo htmlspecialchars($issue['block']); ?>, Room <?php echo htmlspecialchars($issue['room']); ?></div>
                                     </td>
-                                    <td style="padding: 1rem;"><?php echo getStatusBadge($issue['status']); ?></td>
-                                    <td style="padding: 1rem; color: var(--text-muted); font-size: 0.9rem;"><?php echo date('M d, Y', strtotime($issue['created_at'])); ?></td>
+                                    <td style="padding: 1rem;" data-field="assigned_to">
+                                        <?php if (!empty($issue['assigned_to']) && isset($staff_lookup[$issue['assigned_to']])): ?>
+                                            <span style="display: inline-flex; align-items: center; gap: 0.35rem; color: #60a5fa; font-size: 0.85rem;">
+                                                <i class="fas fa-user-cog" style="font-size: 0.75rem;"></i>
+                                                <?php echo htmlspecialchars($staff_lookup[$issue['assigned_to']]['name']); ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span style="color: var(--text-muted); font-size: 0.85rem;">— Awaiting assignment</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td style="padding: 1rem;" data-field="status">
+                                        <?php echo getStatusBadge($issue['status']); ?>
+                                    </td>
+                                    <td style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap;">
+                                        <?php echo date('M d, Y', strtotime($issue['created_at'])); ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -168,19 +185,16 @@ function getStatusBadge($status) {
         </main>
     </div>
 
-    <script>
-    function applyTheme(isLight) {
-        if (isLight) {
-            document.body.classList.add('student-light-mode');
-        } else {
-            document.body.classList.remove('student-light-mode');
-        }
-    }
+    <!-- Live Unified Polling & Real-time Synchronization -->
+    <script src="../assets/js/issue-sync.js"></script>
 
-    (function loadTheme() {
-        const saved = localStorage.getItem('studentTheme');
-        const isLight = saved === null ? true : saved === 'light';
-        applyTheme(isLight);
+    <script>
+    // Theme Toggle Functionality
+    (function initTheme() {
+        const savedTheme = localStorage.getItem('studentTheme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('student-light-mode');
+        }
     })();
     </script>
 </body>

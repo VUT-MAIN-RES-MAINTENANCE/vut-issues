@@ -781,5 +781,428 @@
         "description": "Admin logged in: Administrator",
         "related_issue": null,
         "timestamp": "2026-10-10 11:19:08"
+    },
+    {
+        "id": "activity_6acbcf8ff40bffedbdb6a",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-11 20:04:00"
+    },
+    {
+        "id": "activity_6acbcf9367abd4e823905",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-11 20:04:03"
+    },
+    {
+        "id": "activity_6acc9f86e9816cb8986c9",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-12 10:51:18"
+    },
+    {
+        "id": "activity_6acc9f881e7f8501f04ec",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-12 10:51:20"
+    },
+    {
+        "id": "activity_6acc9f8915f82faa011a9",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-12 10:51:21"
+    },
+    {
+        "id": "activity_6acc9fdd45c30e00636e4",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 10:52:45"
+    },
+    {
+        "id": "activity_6acc9fe567b60da81023e",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "update_theme",
+        "description": "Updated theme to: light",
+        "related_issue": null,
+        "timestamp": "2026-10-12 10:52:53"
+    },
+    {
+        "id": "activity_6acc9fe754c4bcd3b6b89",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "update_theme",
+        "description": "Updated theme to: dark",
+        "related_issue": null,
+        "timestamp": "2026-10-12 10:52:55"
+    },
+    {
+        "id": "activity_6acca00d745473c5d1d86",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "assign_issue",
+        "description": "Assigned issue issue_6ac9f657b35271f20c8c9 to staff staff_67f8a9b4e3c2d1",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-12 10:53:33"
+    },
+    {
+        "id": "activity_6acca0168cebfa469f2f8",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "assign_issue",
+        "description": "Assigned issue issue_6ac9f657b35271f20c8c9 to staff staff_67f8a9b4e3c2d1",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-12 10:53:42"
+    },
+    {
+        "id": "activity_6acca030e6409011b2d83",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-12 10:54:08"
+    },
+    {
+        "id": "activity_6acca03e64b9ef7409910",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "update_issue",
+        "description": "Updated issue status to: in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-12 10:54:22"
+    },
+    {
+        "id": "activity_6acca106cdc793fae13bf",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "report_issue",
+        "description": "Reported issue: Door Handle Broken",
+        "related_issue": "issue_6acca106cc5b6d8cb2b18",
+        "timestamp": "2026-10-12 10:57:42"
+    },
+    {
+        "id": "activity_6acca106d5c4d7c1dfab7",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "start_working",
+        "description": "Staff John Maintenance started work",
+        "related_issue": "issue_6acca106cc5b6d8cb2b18",
+        "timestamp": "2026-10-12 10:57:42"
+    },
+    {
+        "id": "activity_6acca106df1f8b609c43a",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "mark_fixed",
+        "description": "Staff completed work: Replaced interior spindle and latch mechanism with standard Yale handle. Tested 5 times.",
+        "related_issue": "issue_6acca106cc5b6d8cb2b18",
+        "timestamp": "2026-10-12 10:57:42"
+    },
+    {
+        "id": "activity_6acca57950cdef633ad4e",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 11:16:41"
+    },
+    {
+        "id": "activity_6acca579750ce452f6a40",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-12 11:16:41"
+    },
+    {
+        "id": "activity_6acccf416291edaec4737",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-12 14:14:57"
+    },
+    {
+        "id": "activity_6accd44d27c115b2f16c9",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-12 14:36:29"
+    },
+    {
+        "id": "activity_6accddb00c8ae3cc09a0e",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "mark_fixed",
+        "description": "Marked issue as fixed: table (Notes: fixed the issue)",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-12 15:16:32"
+    },
+    {
+        "id": "activity_6accdddec95f1ec6c85ae",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:17:18"
+    },
+    {
+        "id": "activity_6acce00d03de897f1c540",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:26:37"
+    },
+    {
+        "id": "activity_6acce012ec1bd6a5dc63b",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "update_theme",
+        "description": "Updated theme to: light",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:26:42"
+    },
+    {
+        "id": "activity_6acce05ed625c18998ee1",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "update_status",
+        "description": "Updated issue issue_6ac9f657b35271f20c8c9 status to completed",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-12 15:27:58"
+    },
+    {
+        "id": "activity_6acce064e10a4778f840b",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "update_status",
+        "description": "Updated issue issue_6ac9f657b35271f20c8c9 status to in_progress",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-12 15:28:04"
+    },
+    {
+        "id": "activity_6acce06aa95c8b477cd13",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "update_status",
+        "description": "Updated issue issue_6ac9f657b35271f20c8c9 status to completed",
+        "related_issue": "issue_6ac9f657b35271f20c8c9",
+        "timestamp": "2026-10-12 15:28:10"
+    },
+    {
+        "id": "activity_6acce0862d3e19edfb893",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:28:38"
+    },
+    {
+        "id": "activity_6acce1884bf18a2d266f7",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "update_theme",
+        "description": "Updated theme to: dark",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:32:56"
+    },
+    {
+        "id": "activity_6acce207cee12879ae1f5",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:35:03"
+    },
+    {
+        "id": "activity_6acce269e98dae9f36791",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:36:41"
+    },
+    {
+        "id": "activity_6acce4a4df13376f82977",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:46:12"
+    },
+    {
+        "id": "activity_6acce5b3d87e506ded9e7",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "report_issue",
+        "description": "Reported issue: stove",
+        "related_issue": "issue_6acce5b3d7d23fd518923",
+        "timestamp": "2026-10-12 15:50:43"
+    },
+    {
+        "id": "activity_6acce5c9d33f03a0f436a",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:51:05"
+    },
+    {
+        "id": "activity_6acce5d27bc0ca896da97",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "start_working",
+        "description": "Started working on issue: stove",
+        "related_issue": "issue_6acce5b3d7d23fd518923",
+        "timestamp": "2026-10-12 15:51:14"
+    },
+    {
+        "id": "activity_6acce5eedd30d34a38998",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:51:42"
+    },
+    {
+        "id": "activity_6acce60061de80ec560b4",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "update_status",
+        "description": "Updated issue issue_6acce5b3d7d23fd518923 status to in_progress",
+        "related_issue": "issue_6acce5b3d7d23fd518923",
+        "timestamp": "2026-10-12 15:52:00"
+    },
+    {
+        "id": "activity_6acce61539467e5df7d17",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "update_status",
+        "description": "Updated issue issue_6acce5b3d7d23fd518923 status to completed",
+        "related_issue": "issue_6acce5b3d7d23fd518923",
+        "timestamp": "2026-10-12 15:52:21"
+    },
+    {
+        "id": "activity_6acce6289da4e0ae85d40",
+        "user_id": "staff_67f8a9b4e3c2d1",
+        "role": "staff",
+        "action": "login",
+        "description": "Staff logged in: John Maintenance",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:52:40"
+    },
+    {
+        "id": "activity_6acce6c3ac642d5037ae3",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:55:15"
+    },
+    {
+        "id": "activity_6acce6cb1d37593545271",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:55:23"
+    },
+    {
+        "id": "activity_6acce6d2cf2dc89620b29",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:55:30"
+    },
+    {
+        "id": "activity_6acce6d7a72a52cd89c2e",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:55:35"
+    },
+    {
+        "id": "activity_6acce6ddc6fcc38278979",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:55:41"
+    },
+    {
+        "id": "activity_6acce6e496a721da1cdb9",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:55:48"
+    },
+    {
+        "id": "activity_6acce6ef58ed6dbac2cca",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:55:59"
+    },
+    {
+        "id": "activity_6acce796577b3613cfe8c",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "add_staff",
+        "description": "Added staff: admin@vut.ac.za",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:58:46"
+    },
+    {
+        "id": "activity_6acce7b8aff75ded32177",
+        "user_id": "student_6abf846b98c7019a9a70b",
+        "role": "student",
+        "action": "login",
+        "description": "Student logged in: Mavangwa",
+        "related_issue": null,
+        "timestamp": "2026-10-12 15:59:20"
     }
 ]

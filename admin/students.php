@@ -10,7 +10,7 @@ $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_ADMIN);
 
 if (!$user) {
-    header('Location: login.php');
+    header('Location: ../student/login.php');
     exit;
 }
 
@@ -24,6 +24,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 }
 
 $students = json_read(STUDENTS_FILE);
+$settings = json_read(SETTINGS_FILE);
 
 usort($students, function($a, $b) {
     return strtotime($b['created_at'] ?? 0) - strtotime($a['created_at'] ?? 0);
@@ -193,23 +194,46 @@ $display_email = $user['email'] ?? '';
         </main>
     </div>
     <script>
-    (function applyAdminTheme(){
-        const saved = localStorage.getItem('adminTheme');
-        if (saved !== 'light') return;
+    function applyTheme(isLight) {
         const root = document.documentElement;
-        root.style.setProperty('--admin-bg-primary', '#f5f7fb');
-        root.style.setProperty('--admin-bg-secondary', '#ffffff');
-        root.style.setProperty('--admin-bg-tertiary', '#eef2f7');
-        root.style.setProperty('--admin-sidebar-bg', 'rgba(255, 255, 255, 0.92)');
-        root.style.setProperty('--admin-topbar-bg', 'rgba(255, 255, 255, 0.95)');
-        root.style.setProperty('--admin-glass-bg', 'rgba(255, 255, 255, 0.8)');
-        root.style.setProperty('--admin-glass-border', 'rgba(15, 23, 42, 0.1)');
-        root.style.setProperty('--admin-glass-highlight', 'rgba(15, 23, 42, 0.04)');
-        root.style.setProperty('--admin-text-primary', '#0f172a');
-        root.style.setProperty('--admin-text-secondary', '#334155');
-        root.style.setProperty('--admin-text-muted', '#64748b');
-        root.style.setProperty('--admin-text-dim', '#94a3b8');
-        document.body.classList.add('admin-light-mode');
+        const body = document.body;
+        
+        if (isLight) {
+            root.style.setProperty('--admin-bg-primary', '#f5f7fb');
+            root.style.setProperty('--admin-bg-secondary', '#ffffff');
+            root.style.setProperty('--admin-bg-tertiary', '#eef2f7');
+            root.style.setProperty('--admin-sidebar-bg', 'rgba(255, 255, 255, 0.92)');
+            root.style.setProperty('--admin-topbar-bg', 'rgba(255, 255, 255, 0.95)');
+            root.style.setProperty('--admin-glass-bg', 'rgba(255, 255, 255, 0.8)');
+            root.style.setProperty('--admin-glass-border', 'rgba(15, 23, 42, 0.1)');
+            root.style.setProperty('--admin-glass-highlight', 'rgba(15, 23, 42, 0.04)');
+            root.style.setProperty('--admin-text-primary', '#0f172a');
+            root.style.setProperty('--admin-text-secondary', '#334155');
+            root.style.setProperty('--admin-text-muted', '#64748b');
+            root.style.setProperty('--admin-text-dim', '#94a3b8');
+            body.classList.add('admin-light-mode');
+        } else {
+            root.style.removeProperty('--admin-bg-primary');
+            root.style.removeProperty('--admin-bg-secondary');
+            root.style.removeProperty('--admin-bg-tertiary');
+            root.style.removeProperty('--admin-sidebar-bg');
+            root.style.removeProperty('--admin-topbar-bg');
+            root.style.removeProperty('--admin-glass-bg');
+            root.style.removeProperty('--admin-glass-border');
+            root.style.removeProperty('--admin-glass-highlight');
+            root.style.removeProperty('--admin-text-primary');
+            root.style.removeProperty('--admin-text-secondary');
+            root.style.removeProperty('--admin-text-muted');
+            root.style.removeProperty('--admin-text-dim');
+            body.classList.remove('admin-light-mode');
+        }
+    }
+
+    (function loadTheme() {
+        const serverTheme = <?php echo json_encode($settings['appearance']['theme'] ?? 'dark'); ?>;
+        const isLight = serverTheme === 'light';
+        localStorage.setItem('adminTheme', serverTheme);
+        applyTheme(isLight);
     })();
     </script>
 </body>

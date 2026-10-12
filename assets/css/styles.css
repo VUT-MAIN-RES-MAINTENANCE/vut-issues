@@ -10,20 +10,6 @@
     --footer-bg: #10243a;
 }
 
-body.maintenance-light-mode {
-    --bg-color: #f5f7fb;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(15, 23, 42, 0.1);
-    --footer-bg: #1e293b;
-}
-
-/* Header and sidebar stay dark in light mode */
-body.maintenance-light-mode .maintenance-sidebar {
-    background: linear-gradient(180deg, #0d1b2a 0%, #1b3a4b 100%);
-}
-
 /* Student Layout */
 .student-layout {
     display: flex;
@@ -135,7 +121,8 @@ body.maintenance-light-mode .maintenance-sidebar {
     margin-left: 260px;
     padding: 2rem;
     padding-top: 7rem;
-    min-height: 100vh;
+    overflow-y: auto;
+    max-height: 100vh;
 }
 
 .student-header {
@@ -200,12 +187,855 @@ body.maintenance-light-mode .maintenance-sidebar {
 }
 
 /* Student light mode overrides */
+body.student-light-mode {
+    background: #f5f7fb !important;
+    color: #111827;
+}
+
 body.student-light-mode .student-sidebar {
-    background: linear-gradient(180deg, #0d1b2a 0%, #1b3a4b 100%);
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb;
 }
 
 body.student-light-mode .student-header {
-    background: rgba(9, 10, 15, 0.8);
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+body.student-light-mode .student-header h1,
+body.student-light-mode .student-header p,
+body.student-light-mode .student-header .student-user-info strong,
+body.student-light-mode .student-header .student-user-info span {
+    color: #111827;
+}
+
+body.student-light-mode .student-main {
+    background: #f5f7fb;
+}
+
+body.student-light-mode .student-sidebar-header h2 {
+    color: #111827;
+}
+
+body.student-light-mode .student-sidebar-header span {
+    color: #6b7280;
+}
+
+body.student-light-mode .student-sidebar a {
+    color: #374151;
+}
+
+body.student-light-mode .student-sidebar a:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+body.student-light-mode .student-sidebar a.active {
+    background: #000000;
+    color: #ffffff;
+}
+
+body.student-light-mode .student-sidebar-footer {
+    border-top: 1px solid #e5e7eb;
+}
+
+body.student-light-mode .student-sidebar-footer a {
+    color: #ffffff;
+    background: #000000;
+}
+
+body.student-light-mode .student-sidebar-footer a:hover {
+    background: #333333;
+}
+
+/* Student light mode - Cards and containers */
+body.student-light-mode .settings-card,
+body.student-light-mode .settings-section {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.student-light-mode .settings-section-title {
+    color: #111827;
+}
+
+body.student-light-mode .settings-item-info label {
+    color: #111827;
+}
+
+body.student-light-mode .settings-item-info p {
+    color: #6b7280;
+}
+
+/* Student light mode - Forms */
+body.student-light-mode .form-control,
+body.student-light-mode input,
+body.student-light-mode select,
+body.student-light-mode textarea {
+    background: #ffffff;
+    color: #111827;
+    border-color: #d1d5db;
+}
+
+body.student-light-mode .form-control::placeholder,
+body.student-light-mode input::placeholder,
+body.student-light-mode textarea::placeholder {
+    color: #9ca3af;
+}
+
+body.student-light-mode .form-group label {
+    color: #111827;
+}
+
+/* Student light mode - Buttons */
+body.student-light-mode .btn-primary {
+    background: #000000;
+    color: #ffffff;
+}
+
+body.student-light-mode .btn-secondary {
+    background: #f3f4f6;
+    color: #111827;
+    border-color: #d1d5db;
+}
+
+body.student-light-mode .btn-danger {
+    background: #fef2f2;
+    color: #ef4444;
+    border-color: #fca5a5;
+}
+
+/* Student light mode - Tables */
+body.student-light-mode table {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.student-light-mode table th {
+    background: #f9fafb;
+    color: #000000;
+}
+
+body.student-light-mode table td {
+    color: #111827;
+    border-color: #e5e7eb;
+}
+
+body.student-light-mode table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* Student light mode - Status badges */
+body.student-light-mode .status-badge {
+    color: #111827;
+}
+
+/* Student light mode - Links */
+body.student-light-mode a {
+    color: #000000;
+}
+
+body.student-light-mode a:hover {
+    color: #333333;
+}
+
+/* Student light mode - Modal */
+body.student-light-mode .modal {
+    background: #ffffff;
+    color: #111827;
+    border-color: #e5e7eb;
+}
+
+body.student-light-mode .modal-head h3 {
+    color: #111827;
+}
+
+body.student-light-mode .modal-close {
+    color: #6b7280;
+}
+
+body.student-light-mode .student-main h2 {
+    color: #000000 !important;
+}
+
+body.student-light-mode .student-main h3 {
+    color: #000000 !important;
+}
+
+body.student-light-mode .student-main p {
+    color: #111827 !important;
+}
+
+body.student-light-mode .student-main > div[style*="background: var(--glass-bg)"] {
+    background: #ffffff !important;
+    border-color: #e5e7eb !important;
+}
+
+body.student-light-mode .student-main > div[style*="background: var(--glass-bg)"] span {
+    color: #111827 !important;
+}
+
+body.student-light-mode .student-main > div[style*="background: var(--glass-bg)"] h3 {
+    color: #000000 !important;
+}
+
+body.student-light-mode .student-main > div[style*="background: var(--glass-bg)"] p {
+    color: #111827 !important;
+}
+
+/* Student light mode - Profile page specific overrides */
+body.student-light-mode .student-main label {
+    color: #000000 !important;
+}
+
+body.student-light-mode .student-main input {
+    color: #000000 !important;
+}
+
+body.student-light-mode .student-main input[disabled] {
+    color: #6b7280 !important;
+}
+
+body.student-light-mode .student-main small {
+    color: #6b7280 !important;
+}
+
+/* Student light mode - Toast notifications */
+body.student-light-mode .toast {
+    background: #ffffff;
+    color: #111827;
+    border-color: #e5e7eb;
+}
+
+body.student-light-mode .toast.success {
+    color: #22c55e;
+}
+
+body.student-light-mode .toast.error {
+    color: #ef4444;
+}
+
+/* Student light mode - Issue cards */
+body.student-light-mode .issue-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(15, 23, 42, 0.15);
+}
+
+body.student-light-mode .issue-card h3 {
+    color: #0f172a;
+}
+
+body.student-light-mode .issue-card p {
+    color: #64748b;
+}
+
+/* Student light mode - Stats cards */
+body.student-light-mode .stat-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(15, 23, 42, 0.15);
+}
+
+body.student-light-mode .stat-card h3 {
+    color: #0f172a;
+}
+
+body.student-light-mode .stat-card p {
+    color: #64748b;
+}
+
+/* Student light mode - Action cards */
+body.student-light-mode .action-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(15, 23, 42, 0.15);
+}
+
+body.student-light-mode .action-card h3 {
+    color: #0f172a;
+}
+
+body.student-light-mode .action-card p {
+    color: #64748b;
+}
+
+/* Student light mode - Profile section */
+body.student-light-mode .profile-section {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(15, 23, 42, 0.15);
+}
+
+body.student-light-mode .profile-section h3 {
+    color: #0f172a;
+}
+
+body.student-light-mode .profile-info-label {
+    color: #64748b;
+}
+
+body.student-light-mode .profile-info-value {
+    color: #0f172a;
+}
+
+/* Report Issue Table - Clean Design */
+.report-table-integrated {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--glass-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+}
+
+.report-table-integrated thead {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.report-table-integrated thead th {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.report-table-integrated tbody tr {
+    transition: background 0.2s ease;
+}
+
+.report-table-integrated tbody tr:hover {
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.report-table-integrated td {
+    padding: 0.875rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.report-table-integrated td.label-col {
+    background: rgba(59, 130, 246, 0.05);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: 140px;
+}
+
+.report-table-integrated td.report-col-2,
+.report-table-integrated td.report-col-3 {
+    border-left: 1px solid var(--glass-border);
+}
+
+.report-table-integrated select,
+.report-table-integrated input[type="text"],
+.report-table-integrated input[type="file"],
+.report-table-integrated textarea {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    color: var(--text-main);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.report-table-integrated select:focus,
+.report-table-integrated input:focus,
+.report-table-integrated textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.report-table-integrated select option {
+    background: #1a1a2e;
+    color: white;
+}
+
+.report-table-integrated textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.report-table-integrated input[type="file"] {
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.report-table-integrated input[type="file"]::file-selector-button {
+    background: var(--accent-color);
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.report-table-integrated input[type="file"]::file-selector-button:hover {
+    opacity: 0.9;
+}
+
+/* Light mode override for report table */
+body.student-light-mode .report-table-integrated {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.student-light-mode .report-table-integrated thead {
+    background: #f8fafc;
+}
+
+body.student-light-mode .report-table-integrated td.label-col {
+    background: #f8fafc;
+    color: #64748b;
+}
+
+body.student-light-mode .report-table-integrated select,
+body.student-light-mode .report-table-integrated input[type="text"],
+body.student-light-mode .report-table-integrated input[type="file"],
+body.student-light-mode .report-table-integrated textarea {
+    background: #ffffff;
+    border-color: #e5e7eb;
+    color: #111827;
+}
+
+body.student-light-mode .report-table-integrated select option {
+    background: #ffffff;
+    color: #111827;
+}
+
+body.student-light-mode .report-table-integrated select:focus,
+body.student-light-mode .report-table-integrated input:focus,
+body.student-light-mode .report-table-integrated textarea:focus {
+    background: #ffffff;
+    border-color: var(--accent-color);
+}
+
+/* Maintenance Staff light mode overrides */
+body.maintenance-light-mode {
+    background: #f5f7fb !important;
+    color: #111827;
+}
+
+body.maintenance-light-mode .maintenance-sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb;
+}
+
+body.maintenance-light-mode .maintenance-sidebar-header {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+body.maintenance-light-mode .maintenance-sidebar-header h2 {
+    color: #111827;
+}
+
+body.maintenance-light-mode .maintenance-sidebar-header span {
+    color: #6b7280;
+}
+
+body.maintenance-light-mode .maintenance-sidebar a {
+    color: #374151;
+}
+
+body.maintenance-light-mode .maintenance-sidebar a:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+body.maintenance-light-mode .maintenance-sidebar a.active {
+    background: #000000;
+    color: #ffffff;
+}
+
+body.maintenance-light-mode .maintenance-sidebar-footer {
+    border-top: 1px solid #e5e7eb;
+}
+
+body.maintenance-light-mode .maintenance-sidebar-footer a {
+    color: #ffffff;
+    background: #000000;
+}
+
+body.maintenance-light-mode .maintenance-sidebar-footer a:hover {
+    background: #333333;
+}
+
+body.maintenance-light-mode .maintenance-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+body.maintenance-light-mode .maintenance-header h1,
+body.maintenance-light-mode .maintenance-header p,
+body.maintenance-light-mode .maintenance-header .maintenance-user-info strong,
+body.maintenance-light-mode .maintenance-header .maintenance-user-info span {
+    color: #111827;
+}
+
+body.maintenance-light-mode .maintenance-main {
+    background: #f5f7fb;
+}
+
+body.maintenance-light-mode .maintenance-user-info {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+}
+
+/* Maintenance light mode - Cards and containers */
+body.maintenance-light-mode .settings-card,
+body.maintenance-light-mode .settings-section {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.maintenance-light-mode .settings-section-title {
+    color: #111827;
+}
+
+body.maintenance-light-mode .settings-item-info label {
+    color: #111827;
+}
+
+body.maintenance-light-mode .settings-item-info p {
+    color: #6b7280;
+}
+
+body.maintenance-light-mode .settings-item {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Maintenance light mode - Forms */
+body.maintenance-light-mode .form-control,
+body.maintenance-light-mode input,
+body.maintenance-light-mode select,
+body.maintenance-light-mode table th {
+    background: #f9fafb;
+    color: #000000 !important;
+    border-color: #d1d5db;
+}
+
+body.maintenance-light-mode .form-control::placeholder,
+body.maintenance-light-mode input::placeholder,
+body.maintenance-light-mode textarea::placeholder {
+    color: #9ca3af;
+}
+
+body.maintenance-light-mode .form-group label {
+    color: #111827;
+}
+
+/* Maintenance light mode - Buttons */
+body.maintenance-light-mode .maintenance-main .btn-primary {
+    background: #000000;
+    color: #ffffff;
+}
+body.maintenance-light-mode .maintenance-main .btn-primary:hover {
+    background: #333333;
+}
+
+body.maintenance-light-mode .btn-primary {
+    background: #000000;
+    color: #ffffff;
+}
+
+body.maintenance-light-mode .btn-primary:hover {
+    background: #333333;
+}
+
+body.maintenance-light-mode .btn-secondary {
+    background: #f3f4f6;
+    color: #111827;
+    border-color: #d1d5db;
+}
+
+body.maintenance-light-mode .btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+body.maintenance-light-mode .btn-danger {
+    background: #fef2f2;
+    color: #ef4444;
+    border-color: #fca5a5;
+}
+
+body.maintenance-light-mode .btn-danger:hover {
+    background: #fee2e2;
+}
+
+/* Maintenance light mode - Tables */
+body.maintenance-light-mode table {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.maintenance-light-mode .maintenance-main table th {
+    background: #f9fafb;
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode table td {
+    color: #111827;
+    border-color: #e5e7eb;
+}
+
+body.maintenance-light-mode table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* Maintenance light mode - Status badges */
+body.maintenance-light-mode .status-badge {
+    color: #111827;
+}
+
+/* Maintenance light mode - Links */
+body.maintenance-light-mode a {
+    color: #111827;
+}
+
+body.maintenance-light-mode a:hover {
+    color: #000000;
+}
+
+/* Maintenance light mode - Modal */
+body.maintenance-light-mode .modal {
+    background: #ffffff;
+    color: #111827;
+    border-color: #e5e7eb;
+}
+
+body.maintenance-light-mode .modal-head h3 {
+    color: #111827;
+}
+
+body.maintenance-light-mode .modal-close {
+    color: #6b7280;
+}
+
+body.maintenance-light-mode .modal-close:hover {
+    color: #111827;
+}
+
+/* Maintenance light mode - Toast notifications */
+body.maintenance-light-mode .toast {
+    background: #ffffff;
+    color: #111827;
+    border-color: #e5e7eb;
+}
+
+body.maintenance-light-mode .toast.success {
+    color: #22c55e;
+}
+
+body.maintenance-light-mode .toast.error {
+    color: #ef4444;
+}
+
+/* Maintenance light mode - Issue cards */
+body.maintenance-light-mode .issue-card {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.maintenance-light-mode .issue-card h3 {
+    color: #111827;
+}
+
+body.maintenance-light-mode .issue-card p {
+    color: #6b7280;
+}
+
+/* Maintenance light mode - Stats cards */
+body.maintenance-light-mode .stat-card {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.maintenance-light-mode .stat-card h3 {
+    color: #111827;
+}
+
+body.maintenance-light-mode .stat-card p {
+    color: #6b7280;
+}
+
+/* Maintenance light mode - Action cards */
+body.maintenance-light-mode .action-card {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.maintenance-light-mode .action-card h3 {
+    color: #111827;
+}
+
+body.maintenance-light-mode .action-card p {
+    color: #6b7280;
+}
+
+/* Maintenance light mode - Profile section */
+body.maintenance-light-mode .profile-section {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+body.maintenance-light-mode .profile-section h3 {
+    color: #111827;
+}
+
+body.maintenance-light-mode .profile-info-label {
+    color: #6b7280;
+}
+
+body.maintenance-light-mode .profile-info-value {
+    color: #111827;
+}
+
+/* Maintenance light mode - Profile page specific overrides */
+body.maintenance-light-mode .maintenance-main label {
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode .maintenance-main input {
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode .maintenance-main input[disabled] {
+    color: #6b7280 !important;
+}
+
+body.maintenance-light-mode .maintenance-main small {
+    color: #6b7280 !important;
+}
+
+body.maintenance-light-mode .maintenance-main h3 {
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode .maintenance-main h2 {
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode .maintenance-main > div[style*="background: var(--glass-bg)"] {
+    background: #ffffff !important;
+    border-color: #e5e7eb !important;
+}
+
+body.maintenance-light-mode .maintenance-main > div[style*="background: var(--glass-bg)"] span {
+    color: #111827 !important;
+}
+
+body.maintenance-light-mode .maintenance-main > div[style*="background: var(--glass-bg)"] h3 {
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode .maintenance-main > div[style*="background: var(--glass-bg)"] p {
+    color: #111827 !important;
+}
+
+body.maintenance-light-mode .maintenance-main .stat-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+body.maintenance-light-mode .maintenance-main .stat-card h3 {
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode .maintenance-main .stat-card p {
+    color: #111827 !important;
+}
+
+body.maintenance-light-mode .maintenance-main .cards-grid a {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+body.maintenance-light-mode .maintenance-main .cards-grid a:hover {
+    background: #ffffff !important;
+    border-color: #e5e7eb !important;
+}
+
+body.maintenance-light-mode .maintenance-main .cards-grid a h3 {
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode .maintenance-main .cards-grid a p {
+    color: #111827 !important;
+}
+
+body.maintenance-light-mode .maintenance-main table td {
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode .maintenance-main table td div {
+    color: #000000 !important;
+}
+
+body.maintenance-light-mode .maintenance-main table td div[style*="color: var(--text-muted)"] {
+    color: #6b7280 !important;
+}
+
+body.maintenance-light-mode .maintenance-main table tbody tr td a {
+    color: #000000 !important;
+}
+
+/* Theme Toggle Styles */
+.theme-toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.theme-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(148, 163, 184, 0.3);
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.theme-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.theme-toggle input:checked + .theme-toggle-slider {
+    background-color: var(--accent-color);
+}
+
+.theme-toggle input:focus + .theme-toggle-slider {
+    box-shadow: 0 0 1px var(--accent-color);
+}
+
+.theme-toggle input:checked + .theme-toggle-slider:before {
+    transform: translateX(24px);
 }
 
 /* Student sidebar mobile toggle */
@@ -1430,13 +2260,13 @@ body {
 .maintenance-layout {
     display: flex;
     min-height: 100vh;
-    background: var(--bg-color);
+    background: #0f172a;
 }
 
 .maintenance-sidebar {
     width: 260px;
-    background: linear-gradient(180deg, #0d1b2a 0%, #1b3a4b 100%);
-    border-right: 1px solid var(--glass-border);
+    background: #1e293b;
+    border-right: 1px solid #334155;
     position: fixed;
     top: 0;
     left: 0;
@@ -1453,7 +2283,7 @@ body {
     align-items: center;
     gap: 0.75rem;
     padding-bottom: 2rem;
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 1px solid #334155;
     margin-bottom: 1.5rem;
 }
 
@@ -1496,14 +2326,13 @@ body {
 }
 
 .maintenance-sidebar-nav a:hover {
-    background: rgba(79, 143, 192, 0.1);
+    background: #334155;
     color: var(--text-main);
 }
 
 .maintenance-sidebar-nav a.active {
     background: var(--accent-color);
     color: white;
-    box-shadow: 0 4px 12px rgba(79, 143, 192, 0.3);
 }
 
 .maintenance-sidebar-nav a i {
@@ -1514,8 +2343,11 @@ body {
 
 .maintenance-sidebar-footer {
     padding-top: 1.5rem;
-    border-top: 1px solid var(--glass-border);
+    border-top: 1px solid #334155;
     margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .maintenance-sidebar-footer a {
@@ -1523,16 +2355,17 @@ body {
     align-items: center;
     gap: 0.75rem;
     padding: 0.85rem 1rem;
-    color: #ef4444;
+    color: #ffffff;
     text-decoration: none;
     border-radius: 8px;
     font-size: 0.95rem;
     font-weight: 500;
     transition: all 0.2s ease;
+    background: #3b82f6;
 }
 
 .maintenance-sidebar-footer a:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: #2563eb;
 }
 
 .maintenance-sidebar-footer a i {
@@ -1545,8 +2378,9 @@ body {
     flex: 1;
     margin-left: 260px;
     padding: 2rem;
+    overflow-y: auto;
+    max-height: 100vh;
     padding-top: 7rem;
-    min-height: 100vh;
 }
 
 .maintenance-header {
@@ -1558,11 +2392,9 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background: rgba(9, 10, 15, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: #1e293b;
     z-index: 999;
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 1px solid #334155;
     margin-bottom: 0;
 }
 
@@ -1583,8 +2415,8 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 0.75rem 1.25rem;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: #334155;
+    border: 1px solid #475569;
     border-radius: 12px;
 }
 
@@ -1614,6 +2446,185 @@ body {
 .maintenance-user-info span {
     font-size: 0.8rem;
     color: var(--text-muted);
+}
+
+/* Glassmorphism Stat Cards */
+.maintenance-main .stat-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.maintenance-main .stat-card:hover {
+    background: #334155;
+}
+
+/* Glassmorphism Action Cards */
+.maintenance-main .cards-grid a {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.maintenance-main .cards-grid a:hover {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+/* Glassmorphism Tables */
+.maintenance-main table {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.maintenance-main table thead tr {
+    background: #334155;
+}
+
+.maintenance-main table th {
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #475569;
+}
+
+.maintenance-main table td {
+    border-top: 1px solid #334155;
+}
+
+.maintenance-main table tbody tr {
+    background: transparent;
+}
+
+/* Glassmorphism Empty State */
+.maintenance-main > div[style*="background: var(--glass-bg)"] {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+}
+
+/* Glassmorphism Forms */
+.maintenance-main input,
+.maintenance-main select,
+.maintenance-main textarea {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+}
+
+.maintenance-main input:focus,
+.maintenance-main select:focus,
+.maintenance-main textarea:focus {
+    background: #334155;
+    border-color: var(--accent-color);
+    outline: none;
+}
+
+.maintenance-main input::placeholder,
+.maintenance-main textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* Glassmorphism Buttons */
+.maintenance-main .btn-primary {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.maintenance-main .btn-primary:hover {
+    background: #2563eb;
+}
+
+.maintenance-main .btn-secondary {
+    background: #334155;
+    color: var(--text-main);
+    border: 1px solid #475569;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.maintenance-main .btn-secondary:hover {
+    background: #475569;
+}
+
+.maintenance-main .btn-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.maintenance-main .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+/* Glassmorphism Settings Cards */
+.maintenance-main .settings-card,
+.maintenance-main .settings-section {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+}
+
+.maintenance-main .settings-item {
+    border-bottom: 1px solid #334155;
+}
+
+/* Glassmorphism Profile Section */
+.maintenance-main .profile-section {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+}
+
+/* Glassmorphism Modal */
+.maintenance-main .modal {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+}
+
+.maintenance-main .modal-head {
+    background: #334155;
+    border-bottom: 1px solid #475569;
+    border-radius: 16px 16px 0 0;
+}
+
+.maintenance-main .modal-close {
+    transition: all 0.2s ease;
+}
+
+.maintenance-main .modal-close:hover {
+    background: #334155;
+    border-radius: 50%;
+}
+
+/* Glassmorphism Toast */
+.maintenance-main .toast {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+}
+
+.maintenance-main .toast.success {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.maintenance-main .toast.error {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
 }
 
 /* Mobile Sidebar Toggle */
@@ -1716,7 +2727,7 @@ body {
 }
 
 .toggle-switch input:checked + .toggle-slider {
-    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+    background: var(--accent-color);
     border-color: transparent;
 }
 

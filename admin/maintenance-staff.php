@@ -10,12 +10,14 @@ $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_ADMIN);
 
 if (!$user) {
-    header('Location: login.php');
+    header('Location: ../student/login.php');
     exit;
 }
 
 $error = '';
 $success = '';
+
+$settings = json_read(SETTINGS_FILE);
 
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $staff_id = $_GET['id'];
@@ -196,7 +198,6 @@ $display_email = $user['email'] ?? '';
                                 <th>Contact</th>
                                 <th>Assigned</th>
                                 <th>Completed</th>
-                                <th>Performance</th>
                                 <th>Added</th>
                                 <th>Actions</th>
                             </tr>
@@ -205,8 +206,6 @@ $display_email = $user['email'] ?? '';
                             <?php foreach ($staff as $member):
                                 $sid = $member['id'];
                                 $load = $staff_load[$sid] ?? ['total' => 0, 'done' => 0];
-                                $rate = $load['total'] > 0 ? round(($load['done'] / $load['total']) * 100) : 0;
-                                $rateColor = $rate >= 75 ? '#22c55e' : ($rate >= 40 ? '#f59e0b' : '#ef4444');
                             ?>
                             <tr>
                                 <td>
@@ -243,22 +242,14 @@ $display_email = $user['email'] ?? '';
                                     </span>
                                 </td>
                                 <td>
-                                    <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 140px;">
-                                        <div style="flex: 1; height: 6px; background: rgba(100, 116, 139, 0.2); border-radius: 3px; overflow: hidden;">
-                                            <div style="height: 100%; width: <?php echo $rate; ?>%; background: <?php echo $rateColor; ?>; border-radius: 3px;"></div>
-                                        </div>
-                                        <span style="font-size: 0.8rem; font-weight: 700; color: <?php echo $rateColor; ?>;"><?php echo $rate; ?>%</span>
-                                    </div>
-                                </td>
-                                <td>
                                     <div style="font-weight: 500;"><?php echo date('M d, Y', strtotime($member['created_at'] ?? 'now')); ?></div>
                                     <div style="font-size: 0.75rem; color: var(--admin-text-muted);"><?php echo date('H:i', strtotime($member['created_at'] ?? 'now')); ?></div>
                                 </td>
                                 <td>
                                     <a href="maintenance-staff.php?action=delete&id=<?php echo htmlspecialchars($member['id']); ?>"
                                        onclick="return confirm('Are you sure you want to delete this staff member?');"
-                                       class="btn btn-danger" style="padding: 0.45rem 0.85rem; font-size: 0.825rem;">
-                                        <i class="fas fa-trash" style="margin-right: 4px;"></i> Remove
+                                       class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+                                        <i class="fas fa-trash"></i> Remove
                                     </a>
                                 </td>
                             </tr>
@@ -270,23 +261,46 @@ $display_email = $user['email'] ?? '';
         </main>
     </div>
     <script>
-    (function applyAdminTheme(){
-        const saved = localStorage.getItem('adminTheme');
-        if (saved !== 'light') return;
+    function applyTheme(isLight) {
         const root = document.documentElement;
-        root.style.setProperty('--admin-bg-primary', '#f5f7fb');
-        root.style.setProperty('--admin-bg-secondary', '#ffffff');
-        root.style.setProperty('--admin-bg-tertiary', '#eef2f7');
-        root.style.setProperty('--admin-sidebar-bg', 'rgba(255, 255, 255, 0.92)');
-        root.style.setProperty('--admin-topbar-bg', 'rgba(255, 255, 255, 0.95)');
-        root.style.setProperty('--admin-glass-bg', 'rgba(255, 255, 255, 0.8)');
-        root.style.setProperty('--admin-glass-border', 'rgba(15, 23, 42, 0.1)');
-        root.style.setProperty('--admin-glass-highlight', 'rgba(15, 23, 42, 0.04)');
-        root.style.setProperty('--admin-text-primary', '#0f172a');
-        root.style.setProperty('--admin-text-secondary', '#334155');
-        root.style.setProperty('--admin-text-muted', '#64748b');
-        root.style.setProperty('--admin-text-dim', '#94a3b8');
-        document.body.classList.add('admin-light-mode');
+        const body = document.body;
+        
+        if (isLight) {
+            root.style.setProperty('--admin-bg-primary', '#f5f7fb');
+            root.style.setProperty('--admin-bg-secondary', '#ffffff');
+            root.style.setProperty('--admin-bg-tertiary', '#eef2f7');
+            root.style.setProperty('--admin-sidebar-bg', 'rgba(255, 255, 255, 0.92)');
+            root.style.setProperty('--admin-topbar-bg', 'rgba(255, 255, 255, 0.95)');
+            root.style.setProperty('--admin-glass-bg', 'rgba(255, 255, 255, 0.8)');
+            root.style.setProperty('--admin-glass-border', 'rgba(15, 23, 42, 0.1)');
+            root.style.setProperty('--admin-glass-highlight', 'rgba(15, 23, 42, 0.04)');
+            root.style.setProperty('--admin-text-primary', '#0f172a');
+            root.style.setProperty('--admin-text-secondary', '#334155');
+            root.style.setProperty('--admin-text-muted', '#64748b');
+            root.style.setProperty('--admin-text-dim', '#94a3b8');
+            body.classList.add('admin-light-mode');
+        } else {
+            root.style.removeProperty('--admin-bg-primary');
+            root.style.removeProperty('--admin-bg-secondary');
+            root.style.removeProperty('--admin-bg-tertiary');
+            root.style.removeProperty('--admin-sidebar-bg');
+            root.style.removeProperty('--admin-topbar-bg');
+            root.style.removeProperty('--admin-glass-bg');
+            root.style.removeProperty('--admin-glass-border');
+            root.style.removeProperty('--admin-glass-highlight');
+            root.style.removeProperty('--admin-text-primary');
+            root.style.removeProperty('--admin-text-secondary');
+            root.style.removeProperty('--admin-text-muted');
+            root.style.removeProperty('--admin-text-dim');
+            body.classList.remove('admin-light-mode');
+        }
+    }
+
+    (function loadTheme() {
+        const serverTheme = <?php echo json_encode($settings['appearance']['theme'] ?? 'dark'); ?>;
+        const isLight = serverTheme === 'light';
+        localStorage.setItem('adminTheme', serverTheme);
+        applyTheme(isLight);
     })();
     </script>
 </body>

@@ -3,17 +3,18 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../includes/json.php';
 
-// Require login and check role
 require_login('login.php');
-require_role(ROLE_STAFF, '../index.php');
+require_role(ROLE_STAFF, 'login.php');
 
 $user_id = get_current_user_id();
 $user = get_user_by_id($user_id, ROLE_STAFF);
 
 if (!$user) {
-    header('Location: login.php');
+    header('Location: ../student/login.php');
     exit;
 }
+
+$settings = json_read(SETTINGS_FILE);
 
 $error = '';
 $success = '';
@@ -22,30 +23,34 @@ $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_POST['issue_id'])) {
     $issue_id = $_POST['issue_id'];
     $action = $_POST['action'];
+    $notes = trim($_POST['maintenance_notes'] ?? '');
     
-    $issue = json_find_by_id(MAINTENANCE_REQUESTS_FILE, $issue_id);
+    $issue = get_issue_by_id($issue_id);
     
     if (!$issue) {
         $error = 'Issue not found.';
     } else {
-        $new_status = '';
+        $updates = [];
+        $desc = '';
         if ($action === 'start_working') {
-            $new_status = STATUS_IN_PROGRESS;
+            $updates['status'] = STATUS_IN_PROGRESS;
+            if (empty($issue['assigned_to'])) {
+                $updates['assigned_to'] = $user_id;
+            }
+            $desc = "Started working on issue: " . ($issue['issue'] ?? $issue_id);
         } elseif ($action === 'mark_fixed') {
-            $new_status = STATUS_COMPLETED;
+            $updates['status'] = STATUS_COMPLETED;
+            if ($notes !== '') {
+                $updates['maintenance_notes'] = $notes;
+            }
+            $desc = "Marked issue as fixed: " . ($issue['issue'] ?? $issue_id) . ($notes ? " (Notes: $notes)" : "");
         } else {
             $error = 'Invalid action.';
         }
         
-        if ($new_status) {
-            $updates = [
-                'status' => $new_status,
-                'updated_at' => date('Y-m-d H:i:s')
-            ];
-            
-            if (json_update(MAINTENANCE_REQUESTS_FILE, $issue_id, $updates)) {
+        if (!empty($updates)) {
+            if (update_maintenance_issue($issue_id, $updates, $user_id, ROLE_STAFF, $action, $desc)) {
                 $success = 'Issue status updated successfully!';
-                log_activity($user_id, ROLE_STAFF, 'update_status', "Updated issue status to: $new_status", $issue_id);
             } else {
                 $error = 'Failed to update issue status.';
             }
@@ -53,25 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_
     }
 }
 
-// Get all issues - show all reported issues
-$all_issues = json_read(MAINTENANCE_REQUESTS_FILE);
-
-// Sort by created date (newest first)
-usort($all_issues, function($a, $b) {
-    return strtotime($b['created_at'] ?? 0) - strtotime($a['created_at'] ?? 0);
-});
-
-// Count all issues by status (not just assigned)
-$total_count = count($all_issues);
-$pending_count = count(array_filter($all_issues, function($issue) {
-    return ($issue['status'] ?? '') === STATUS_PENDING;
-}));
-$in_progress_count = count(array_filter($all_issues, function($issue) {
-    return ($issue['status'] ?? '') === STATUS_IN_PROGRESS;
-}));
-$completed_count = count(array_filter($all_issues, function($issue) {
-    return ($issue['status'] ?? '') === STATUS_COMPLETED;
-}));
+// Get all issues and stats via unified domain helpers
+$all_issues = get_all_issues();
+$stats = get_issue_stats();
+$total_count = $stats['total'];
+$pending_count = $stats['pending'];
+$in_progress_count = $stats['in_progress'];
+$completed_count = $stats['completed'];
 
 // Get user initials for avatar
 $user_initials = strtoupper(substr($user['name'], 0, 1));
@@ -158,7 +151,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
             <div class="stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2.5rem;">
                 <div class="stat-card" style="background: var(--glass-bg); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--glass-border); transition: all 0.3s ease;">
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                        <h3 style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-main);"><?php echo $total_count; ?></h3>
+                        <h3 data-stat="total" style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-main);"><?php echo $total_count; ?></h3>
                         <div style="background: rgba(59, 130, 246, 0.15); padding: 0.5rem; border-radius: 8px;">
                             <i class="fas fa-clipboard-list" style="font-size: 1.25rem; color: #3b82f6;"></i>
                         </div>
@@ -168,7 +161,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
 
                 <div class="stat-card" style="background: var(--glass-bg); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--glass-border); transition: all 0.3s ease;">
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                        <h3 style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-main);"><?php echo $pending_count; ?></h3>
+                        <h3 data-stat="pending" style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-main);"><?php echo $pending_count; ?></h3>
                         <div style="background: rgba(245, 158, 11, 0.15); padding: 0.5rem; border-radius: 8px;">
                             <i class="fas fa-clock" style="font-size: 1.25rem; color: #f59e0b;"></i>
                         </div>
@@ -178,7 +171,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
 
                 <div class="stat-card" style="background: var(--glass-bg); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--glass-border); transition: all 0.3s ease;">
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                        <h3 style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-main);"><?php echo $in_progress_count; ?></h3>
+                        <h3 data-stat="in_progress" style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-main);"><?php echo $in_progress_count; ?></h3>
                         <div style="background: rgba(139, 92, 246, 0.15); padding: 0.5rem; border-radius: 8px;">
                             <i class="fas fa-tools" style="font-size: 1.25rem; color: #8b5cf6;"></i>
                         </div>
@@ -188,7 +181,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
 
                 <div class="stat-card" style="background: var(--glass-bg); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--glass-border); transition: all 0.3s ease;">
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                        <h3 style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-main);"><?php echo $completed_count; ?></h3>
+                        <h3 data-stat="completed" style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--text-main);"><?php echo $completed_count; ?></h3>
                         <div style="background: rgba(34, 197, 94, 0.15); padding: 0.5rem; border-radius: 8px;">
                             <i class="fas fa-check-circle" style="font-size: 1.25rem; color: #22c55e;"></i>
                         </div>
@@ -226,7 +219,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
             </div>
 
             <!-- Recent Issues -->
-            <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: 600;">Recent Issues</h2>
+            <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: 600;">Maintenance Issues</h2>
             <?php if (empty($all_issues)): ?>
                 <div style="background: var(--glass-bg); padding: 4rem 2rem; border-radius: 12px; border: 1px solid var(--glass-border); text-align: center;">
                     <i class="fas fa-inbox" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1.5rem; opacity: 0.5;"></i>
@@ -234,31 +227,43 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                     <p style="color: var(--text-muted);">No maintenance issues are currently available.</p>
                 </div>
             <?php else: ?>
-                <div style="background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border); overflow: hidden;">
+                <div style="background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border); overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background: rgba(79, 143, 192, 0.1);">
-                                <th style="padding: 1rem; text-align: left; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Issue ID</th>
-                                <th style="padding: 1rem; text-align: left; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Issue Type</th>
-                                <th style="padding: 1rem; text-align: left; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Student</th>
-                                <th style="padding: 1rem; text-align: left; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Residence</th>
-                                <th style="padding: 1rem; text-align: left; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Block</th>
-                                <th style="padding: 1rem; text-align: left; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Room</th>
-                                <th style="padding: 1rem; text-align: left; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Status</th>
-                                <th style="padding: 1rem; text-align: left; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Actions</th>
+                                <th style="padding: 0.6rem 0.5rem; text-align: left; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Issue ID</th>
+                                <th style="padding: 0.6rem 0.5rem; text-align: left; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Issue & Notes</th>
+                                <th style="padding: 0.6rem 0.5rem; text-align: left; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Student</th>
+                                <th style="padding: 0.6rem 0.5rem; text-align: left; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Location</th>
+                                <th style="padding: 0.6rem 0.5rem; text-align: left; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Status</th>
+                                <th style="padding: 0.6rem 0.5rem; text-align: left; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="issues-table-body" data-sync-container="issues">
                             <?php foreach ($all_issues as $index => $issue): ?>
-                            <tr style="border-top: 1px solid var(--glass-border); transition: background 0.2s ease;">
-                                <td style="padding: 1rem; font-family: monospace; font-size: 0.9rem;"><?php echo htmlspecialchars(substr($issue['id'], -8)); ?></td>
-                                <td style="padding: 1rem; font-weight: 500;"><?php echo htmlspecialchars($issue['issue']); ?></td>
-                                <td style="padding: 1rem;"><?php echo htmlspecialchars($issue['student_name']); ?></td>
-                                <td style="padding: 1rem;"><?php echo htmlspecialchars($issue['residence']); ?></td>
-                                <td style="padding: 1rem;"><?php echo htmlspecialchars($issue['block']); ?></td>
-                                <td style="padding: 1rem;"><?php echo htmlspecialchars($issue['room']); ?></td>
-                                <td style="padding: 1rem;">
-                                    <span style="padding: 0.35rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; 
+                            <tr data-issue-id="<?php echo htmlspecialchars($issue['id']); ?>" style="border-top: 1px solid var(--glass-border); transition: background 0.2s ease;">
+                                <td style="padding: 0.6rem 0.5rem; font-family: monospace; font-size: 0.75rem;"><?php echo htmlspecialchars(substr($issue['id'], -8)); ?></td>
+                                <td style="padding: 0.6rem 0.5rem;">
+                                    <div style="font-weight: 600; font-size: 0.85rem;"><?php echo htmlspecialchars($issue['issue']); ?></div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);"><?php echo htmlspecialchars($issue['description'] ?? ''); ?></div>
+                                    <div data-field="notes">
+                                        <?php if (!empty($issue['maintenance_notes'])): ?>
+                                            <div style="background: rgba(34, 197, 94, 0.1); border-left: 3px solid #22c55e; padding: 0.25rem 0.45rem; border-radius: 4px; font-size: 0.75rem; color: #86efac; margin-top: 0.25rem;">
+                                                <strong>Resolution:</strong> <?php echo htmlspecialchars($issue['maintenance_notes']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                                <td style="padding: 0.6rem 0.5rem; font-size: 0.8rem;">
+                                    <div><?php echo htmlspecialchars($issue['student_name']); ?></div>
+                                    <div style="font-size: 0.7rem; color: var(--text-muted);"><?php echo htmlspecialchars($issue['student_no'] ?? ''); ?></div>
+                                </td>
+                                <td style="padding: 0.6rem 0.5rem; font-size: 0.8rem;">
+                                    <div><?php echo htmlspecialchars($issue['residence']); ?></div>
+                                    <div style="font-size: 0.7rem; color: var(--text-muted);">Blk <?php echo htmlspecialchars($issue['block']); ?>, Rm <?php echo htmlspecialchars($issue['room']); ?></div>
+                                </td>
+                                <td style="padding: 0.6rem 0.5rem;" data-field="status">
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 500; white-space: nowrap; min-width: 90px;
                                         <?php
                                         $status_colors = [
                                             STATUS_PENDING => 'background: rgba(245, 158, 11, 0.2); color: #f59e0b;',
@@ -271,30 +276,22 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
                                         <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $issue['status']))); ?>
                                     </span>
                                 </td>
-                                <td style="padding: 1rem;">
-                                    <div style="display: flex; gap: 0.35rem; align-items: center;">
-                                        <a href="issue-details.php?id=<?php echo htmlspecialchars($issue['id']); ?>" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.35rem 0.75rem; background: rgba(34, 197, 94, 0.2); color: #22c55e; text-decoration: none; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 4px; font-size: 0.75rem; font-weight: 500; transition: all 0.2s ease; min-width: 95px; white-space: nowrap;">
-                                            View Details <i class="fas fa-arrow-right" style="font-size: 0.65rem;"></i>
+                                <td style="padding: 0.6rem 0.5rem;" data-field="actions">
+                                    <div style="display: flex; gap: 0.25rem; align-items: center;">
+                                        <a href="issue-details.php?id=<?php echo htmlspecialchars($issue['id']); ?>" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background: rgba(34, 197, 94, 0.2); color: #22c55e; text-decoration: none; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 4px; font-size: 0.7rem; font-weight: 500; transition: all 0.2s ease; white-space: nowrap;">
+                                            View <i class="fas fa-arrow-right" style="font-size: 0.55rem;"></i>
                                         </a>
                                         <?php if ($issue['status'] === STATUS_PENDING): ?>
-                                            <form method="POST" action="" style="display: inline;">
-                                                <input type="hidden" name="action" value="start_working">
-                                                <input type="hidden" name="issue_id" value="<?php echo htmlspecialchars($issue['id']); ?>">
-                                                <button type="submit" onclick="return confirm('Start working on this issue?')" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.35rem 0.75rem; background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 4px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; min-width: 95px; white-space: nowrap;">
-                                                    <i class="fas fa-play" style="font-size: 0.65rem;"></i> Start Working
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn-start-working" data-id="<?php echo htmlspecialchars($issue['id']); ?>" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 4px; font-size: 0.7rem; font-weight: 500; cursor: pointer; white-space: nowrap;">
+                                                <i class="fas fa-play" style="font-size: 0.55rem;"></i> Start Working
+                                            </button>
                                         <?php elseif ($issue['status'] === STATUS_IN_PROGRESS): ?>
-                                            <form method="POST" action="" style="display: inline;">
-                                                <input type="hidden" name="action" value="mark_fixed">
-                                                <input type="hidden" name="issue_id" value="<?php echo htmlspecialchars($issue['id']); ?>">
-                                                <button type="submit" onclick="return confirm('Mark this issue as fixed?')" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.35rem 0.75rem; background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 4px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; min-width: 95px; white-space: nowrap;">
-                                                    <i class="fas fa-check" style="font-size: 0.65rem;"></i> Mark as Fixed
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn-mark-fixed" data-id="<?php echo htmlspecialchars($issue['id']); ?>" data-notes="<?php echo htmlspecialchars($issue['maintenance_notes'] ?? ''); ?>" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 4px; font-size: 0.7rem; font-weight: 500; cursor: pointer; white-space: nowrap;">
+                                                <i class="fas fa-check" style="font-size: 0.55rem;"></i> Mark as Fixed
+                                            </button>
                                         <?php elseif ($issue['status'] === STATUS_COMPLETED): ?>
-                                            <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.35rem 0.75rem; background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 4px; font-size: 0.75rem; font-weight: 500; min-width: 95px; white-space: nowrap;">
-                                                <i class="fas fa-check-circle" style="font-size: 0.65rem;"></i> Fixed
+                                            <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 4px; font-size: 0.7rem; font-weight: 500; white-space: nowrap;">
+                                                <i class="fas fa-check-circle" style="font-size: 0.55rem;"></i> Fixed
                                             </span>
                                         <?php endif; ?>
                                     </div>
@@ -308,19 +305,16 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         </main>
     </div>
 
-    <script>
-    function applyTheme(isLight) {
-        if (isLight) {
-            document.body.classList.add('maintenance-light-mode');
-        } else {
-            document.body.classList.remove('maintenance-light-mode');
-        }
-    }
+    <!-- Live Unified Polling & Real-time Sync -->
+    <script src="../assets/js/issue-sync.js"></script>
 
-    (function loadTheme() {
-        const saved = localStorage.getItem('maintenanceTheme');
-        const isLight = saved === null ? true : saved === 'light';
-        applyTheme(isLight);
+    <script>
+    // Theme Toggle Functionality
+    (function initTheme() {
+        const savedTheme = localStorage.getItem('maintenanceTheme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('maintenance-light-mode');
+        }
     })();
     </script>
 </body>
