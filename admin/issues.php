@@ -246,6 +246,7 @@ $display_email = $user['email'] ?? '';
 
     <!-- Live Unified Polling & Real-time Sync -->
     <script src="../assets/js/issue-sync.js"></script>
+    <script src="../assets/js/translations.js"></script>
     <script>
     function applyTheme(isLight) {
         const root = document.documentElement;

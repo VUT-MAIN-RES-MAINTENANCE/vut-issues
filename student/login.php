@@ -11,7 +11,7 @@ $form_data = [];
 // Handle logout
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     logout_user();
-    header('Location: ../index.php');
+    header('Location: ../index.php?logout=1');
     exit;
 }
 
@@ -331,6 +331,7 @@ $signup_role = $form_data['role'] ?? '';
         </div>
     </main>
     <footer class="auth-legal"><span>© 2026 VUT MainRes Maintenance</span><a href="../index.php">Back to home</a></footer>
+    <script src="../assets/js/translations.js"></script>
     <script>
         const authPanel = document.getElementById('auth-panel');
         const authForms = [...document.querySelectorAll('[data-auth-form]')];

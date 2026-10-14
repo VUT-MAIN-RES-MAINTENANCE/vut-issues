@@ -260,6 +260,7 @@ $display_email = $user['email'] ?? '';
             <?php endif; ?>
         </main>
     </div>
+    <script src="../assets/js/translations.js"></script>
     <script>
     function applyTheme(isLight) {
         const root = document.documentElement;

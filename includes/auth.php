@@ -119,6 +119,16 @@ function login_user($user_id, $email, $name, $role) {
 function logout_user() {
     $_SESSION = [];
     session_destroy();
+
+    // Reset language cookie back to English on logout
+    if (!headers_sent()) {
+        setcookie('lang', 'en', [
+            'expires' => time() + 31536000,
+            'path' => '/',
+            'samesite' => 'Lax'
+        ]);
+    }
+    $_COOKIE['lang'] = 'en';
 }
 
 /**

@@ -191,6 +191,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         </main>
     </div>
 
+    <script src="../assets/js/translations.js"></script>
     <script>
     // Theme Toggle Functionality
     (function initTheme() {
