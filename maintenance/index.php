@@ -307,6 +307,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
 
     <!-- Live Unified Polling & Real-time Sync -->
     <script src="../assets/js/issue-sync.js"></script>
+    <script src="../assets/js/translations.js"></script>
 
     <script>
     // Theme Toggle Functionality

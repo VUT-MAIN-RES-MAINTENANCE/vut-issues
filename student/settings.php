@@ -260,6 +260,7 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
         </div>
     </div>
 
+    <script src="../assets/js/translations.js"></script>
     <script>
     function showPasswordModal() {
         document.getElementById('passwordModal').style.display = 'flex';
@@ -286,8 +287,12 @@ $user_initials = strtoupper(substr($user['name'], 0, 1));
     }
 
     function changeLanguage(lang) {
-        document.cookie = `lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
-        showToast('Language preference saved', 'success');
+        if (window.I18N && typeof window.I18N.setLanguage === 'function') {
+            window.I18N.setLanguage(lang);
+        } else {
+            document.cookie = `lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+            showToast('Language preference saved', 'success');
+        }
     }
 
     // Theme Toggle Functionality

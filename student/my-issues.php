@@ -187,6 +187,7 @@ function getStatusBadge($status) {
 
     <!-- Live Unified Polling & Real-time Synchronization -->
     <script src="../assets/js/issue-sync.js"></script>
+    <script src="../assets/js/translations.js"></script>
 
     <script>
     // Theme Toggle Functionality

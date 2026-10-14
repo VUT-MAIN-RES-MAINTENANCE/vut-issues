@@ -257,5 +257,6 @@ else if ($is_student) { $dashboard_url = 'student/index.php'; $dashboard_label =
     <?php if ($page == 'about'): ?>
     <script src="assets/js/about.js?v=<?php echo filemtime(__DIR__ . '/assets/js/about.js'); ?>" defer></script>
     <?php endif; ?>
+    <script src="assets/js/translations.js"></script>
 </body>
 </html>

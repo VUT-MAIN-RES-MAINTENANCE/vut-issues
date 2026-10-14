@@ -1213,5 +1213,23 @@
         "description": "Admin logged in: Administrator",
         "related_issue": null,
         "timestamp": "2026-10-12 19:39:42"
+    },
+    {
+        "id": "activity_6acfac4be115752568da4",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-14 18:22:35"
+    },
+    {
+        "id": "activity_6acfadd1b3166de51b4b5",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-14 18:29:05"
     }
 ]
