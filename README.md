@@ -152,6 +152,27 @@ For example:
 * Maintenance Staff cannot access the Admin interface.
 * Admins cannot access the Student or Maintenance Staff interfaces.
 
+## Login Credentials
+
+### Administrator
+
+- **Email:** admin@vut.ac.za
+- **Password:** password
+
+### Maintenance Staff
+
+- **Email:** staff@vut.ac.za
+- **Password:** password
+- **Name:** Mikhenso Maintenance
+
+- **Email:** admin@vut.ac.za
+- **Password:** password
+- **Name:** Pride
+
+### Student
+
+Students can register their own accounts through the registration page.
+
 ## Data Storage
 
 The system uses JSON files to store application data.

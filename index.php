@@ -152,7 +152,7 @@ else if ($is_student) { $dashboard_url = 'student/index.php'; $dashboard_label =
                 <h2 id="about-story-title">A place to live<br>should feel like <em>home.</em></h2>
             </div>
             <div class="about-story-copy" data-reveal>
-                <p>Based in Vanderbijlpark, Gauteng, VUT MainRes Maintenance supports the people and places that make residence life possible. Our team brings more than 20 years of experience across plumbing, electrical work, building repairs, and urgent maintenance.</p>
+                <p>Based in Vanderbijlpark, Gauteng, VUT MainRes Maintenance supports the people and places that make residence life possible. Our team brings more than 40 years of experience across plumbing, electrical work, building repairs, and urgent maintenance.</p>
                 <p>From the first report to the final repair, we make it easier for students to get help and get back to what matters.</p>
                 <a class="about-inline-link" href="https://vut.ac.za/" target="_blank" rel="noopener">Discover VUT <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
             </div>
