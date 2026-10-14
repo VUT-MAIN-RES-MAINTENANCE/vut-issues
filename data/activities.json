@@ -1204,5 +1204,14 @@
         "description": "Student logged in: Mavangwa",
         "related_issue": null,
         "timestamp": "2026-10-12 15:59:20"
+    },
+    {
+        "id": "activity_6acd1b5e52002dd3b927b",
+        "user_id": "admin_671a2b3c4d5e6f",
+        "role": "admin",
+        "action": "login",
+        "description": "Admin logged in: Administrator",
+        "related_issue": null,
+        "timestamp": "2026-10-12 19:39:42"
     }
 ]
